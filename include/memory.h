@@ -5,14 +5,9 @@
 
 class MemoryControl {
  public:
-  static MemoryControl& GetInstance();
-  MemoryControl(const MemoryControl&) = delete;
-  void operator=(const MemoryControl&) = delete;
-  // virtual ~MemoryControl();
+  MemoryControl();
 
  private:
-  MemoryControl();
-  void InitDevice();
 };
 
 #endif  // MEMORY_H
