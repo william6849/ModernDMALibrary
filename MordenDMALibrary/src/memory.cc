@@ -1,3 +1,3 @@
-#include "include/memory.h"
+#include "memory.h"
 
 MemoryControl::MemoryControl() {}
