@@ -4,7 +4,6 @@
 #include <string>
 
 #include "memory.h"
-
 class Device {
  public:
   static Device& GetInstance();

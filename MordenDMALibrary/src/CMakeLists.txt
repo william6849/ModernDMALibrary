@@ -1,21 +1,30 @@
-link_directories(${CMAKE_BINARY_DIR}/files)
+set(ROOT_DIR ${CMAKE_SOURCE_DIR}/MordenDMALibrary)
 
 include_directories(
-${CMAKE_SOURCE_DIR}/googletest/googletest/include 
-${CMAKE_SOURCE_DIR}/spdlog/include 
-${CMAKE_SOURCE_DIR}/libusb-cmake/libusb/libusb
-${CMAKE_SOURCE_DIR}/MemProcFS/includes
-${CMAKE_SOURCE_DIR}/LeechCore/includes
-${CMAKE_SOURCE_DIR}/MordenDMALibrary/include 
-${CMAKE_INSTALL_PREFIX}/include)
+  ${CMAKE_SOURCE_DIR}/googletest/googletest/include
+  ${CMAKE_SOURCE_DIR}/spdlog/include
+  ${CMAKE_SOURCE_DIR}/libusb-cmake/libusb/libusb
+  ${CMAKE_SOURCE_DIR}/MordenDMALibrary/include
+  ${CMAKE_BINARY_DIR}/third_party/MemProcFS/src/MemProcFS
+  ${CMAKE_INSTALL_PREFIX}/include)
 
-add_library(MDMAL STATIC device.cc memory.cc)
-set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+add_library(memprocfs SHARED IMPORTED GLOBAL)
+set_property(
+  TARGET memprocfs
+  PROPERTY IMPORTED_LOCATION
+           ${CMAKE_BINARY_DIR}/third_party/MemProcFS/src/MemProcFS/vmm.so)
 
-target_include_directories(MDMAL BEFORE PUBLIC ${CMAKE_BINARY_DIR}/includes)
-target_link_libraries(MDMAL PRIVATE libusb-1.0)
+file(GLOB SOURCES "${ROOT_DIR}/src/*.cc")
+file(GLOB HEADERS "${ROOT_DIR}/include/*.h")
+add_library(MDMAL ${SOURCES} ${HEADERS})
 
-add_dependencies(MDMAL leechcore)
-add_dependencies(MDMAL vmm)
-add_dependencies(MDMAL memprocfs)
+if(WIN32)
+  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+endif()
+
+target_link_libraries(MDMAL memprocfs)
+target_link_libraries(MDMAL usb-1.0)
+
+add_dependencies(MDMAL LeechCore)
+add_dependencies(MDMAL MemProcFS)
 add_dependencies(MDMAL spdlog)
