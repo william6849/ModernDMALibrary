@@ -1,12 +1,6 @@
 include(ExternalProject)
 
-set(ROOT ${CMAKE_BINARY_DIR}/third_party/LeechCore)
-set(LIB_DIR ${ROOT}/lib)
-set(INCLUDE_DIR ${ROOT}/include)
-
-set(BUILD_COMMAND
-    "cp ${ROOT}/src/LeechCore/*.h ${CMAKE_BINARY_DIR}/include && cp ${ROOT}/src/LeechCore/*.${CMAKE_SHARED_LIBRARY_PREFIX} ${CMAKE_BINARY_DIR}/include"
-)
+set(ROOT_DIR ${CMAKE_BINARY_DIR}/third_party/LeechCore)
 
 if(WIN32)
   set(URL
@@ -33,7 +27,8 @@ message("Get: " ${URL})
 ExternalProject_Add(
   LeechCore
   URL ${URL}
-  PREFIX ${ROOT}
+  SOURCE_DIR ${ROOT_DIR}
+  BINARY_DIR ${ROOT_DIR}
   BUILD_COMMAND ""
   CONFIGURE_COMMAND ""
   INSTALL_COMMAND "")
