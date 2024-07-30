@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.26)
-project(MDL VERSION 0.1)
+project(morden_dma_library VERSION 0.1)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -11,8 +11,17 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O1")
 # set(CMAKE_CXX_FLAGS_RELWITHDEBINFO
 # "${CMAKE_CXX_FLAGS_RELEASE} ${CMAKE_CXX_FLAGS_DEBUG}")
 
-if(WIN32)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+option(BUILD_SHARED_LIBS "Specifies the type of libraries (SHARED or STATIC) to build" OFF)
+
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/install/morden_dma_library")
+endif()
+
+if(WIN32)
 else()
   add_compile_definitions(LINUX)
 endif()
