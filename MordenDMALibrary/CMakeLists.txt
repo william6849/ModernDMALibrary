@@ -3,46 +3,61 @@ file(GLOB_RECURSE HEADER_FILES "*.h")
 
 set(ROOT_DIR ${CMAKE_SOURCE_DIR}/MordenDMALibrary)
 set(TARGET_LIBRARY_NAME MDMAL)
-set(MEMPROCFS_LIB_NAME memprocfs)
 
 if(BUILD_SHARED_LIBS)
-  add_library(${TARGET_LIBRARY_NAME} SHARED ${SOURCE_FILES} ${HEADER_FILES})
+  add_library(${TARGET_LIBRARY_NAME} SHARED ${SOURCE_FILES})
   target_compile_definitions(${TARGET_LIBRARY_NAME}
                              PUBLIC -DMDMAL_LIB_SHARED_BUILD)
   target_compile_definitions(${TARGET_LIBRARY_NAME} PRIVATE -DMDMAL_LIB_EXPORTS)
 else()
-  add_library(${TARGET_LIBRARY_NAME} STATIC ${SOURCE_FILES} ${HEADER_FILES})
+  add_library(${TARGET_LIBRARY_NAME} STATIC ${SOURCE_FILES})
 endif()
 
 target_include_directories(
-  ${TARGET_LIBRARY_NAME} PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
-                                $<INSTALL_INTERFACE:include>)
+  ${TARGET_LIBRARY_NAME}
+  PUBLIC $<INSTALL_INTERFACE:include>
+         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
+          ${CMAKE_SOURCE_DIR}/libusb-cmake/libusb/libusb
+          ${CMAKE_SOURCE_DIR}/spdlog/include
+          ${CMAKE_SOURCE_DIR}/googletest/googletest/include
+          ${CMAKE_BINARY_DIR}/third_party/LeechCore
+          ${CMAKE_BINARY_DIR}/third_party/MemProcFS)
 
-add_library(${MEMPROCFS_LIB_NAME} SHARED IMPORTED GLOBAL)
+add_library(leechcore SHARED IMPORTED)
 if(WIN32)
   set_property(
-    TARGET ${MEMPROCFS_LIB_NAME}
-    PROPERTY IMPORTED_LOCATION
-             ${CMAKE_BINARY_DIR}/third_party/MemProcFS/src/MemProcFS/vmm.dll)
-  set_property(
-    TARGET ${MEMPROCFS_LIB_NAME}
-    PROPERTY
-      IMPORTED_IMPLIB
-      ${CMAKE_BINARY_DIR}/third_party/LeechCore/src/LeechCore/leechcore.dll)
+    TARGET leechcore
+    PROPERTY IMPORTED_IMPLIB
+             ${CMAKE_BINARY_DIR}/third_party/LeechCore/leechcore.lib)
 else()
   set_property(
-    TARGET ${MEMPROCFS_LIB_NAME}
-    PROPERTY
-      IMPORTED_IMPLIB
-      ${CMAKE_BINARY_DIR}/third_party/LeechCore/src/LeechCore/leechcore.so)
+    TARGET leechcore
+    PROPERTY IMPORTED_LOCATION
+             ${CMAKE_BINARY_DIR}/third_party/LeechCore/leechcore.so)
+endif()
+
+add_library(memprocfs SHARED IMPORTED)
+if(WIN32)
+  set_property(
+    TARGET memprocfs
+    PROPERTY IMPORTED_IMPLIB
+             ${CMAKE_BINARY_DIR}/third_party/LeechCore/leechcore.lib)
+else()
+  set_property(
+    TARGET memprocfs PROPERTY IMPORTED_LOCATION
+                              ${CMAKE_BINARY_DIR}/third_party/MemProcFS/vmm.so)
 endif()
 
 if(WIN32)
   set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif()
 
+target_link_libraries(${TARGET_LIBRARY_NAME} leechcore)
+target_link_libraries(${TARGET_LIBRARY_NAME} memprocfs)
+
 add_dependencies(${TARGET_LIBRARY_NAME} LeechCore)
-add_dependencies(${TARGET_LIBRARY_NAME} ${MEMPROCFS_LIB_NAME})
+add_dependencies(${TARGET_LIBRARY_NAME} MemProcFS)
 add_dependencies(${TARGET_LIBRARY_NAME} usb-1.0)
 add_dependencies(${TARGET_LIBRARY_NAME} spdlog)
 
