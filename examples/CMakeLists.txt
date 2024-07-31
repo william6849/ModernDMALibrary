@@ -9,7 +9,7 @@ if(WIN32)
     POST_BUILD
     COMMAND
       ${CMAKE_COMMAND} -E copy
-      ${CMAKE_BINARY_DIR}/third_party/LeechCore/leechcore.dll
+      ${CMAKE_BINARY_DIR}/third_party/Source/LeechCore/leechcore.dll
       ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}/leechcore.dll)
 
   add_custom_command(
@@ -17,7 +17,7 @@ if(WIN32)
     POST_BUILD
     COMMAND
       ${CMAKE_COMMAND} -E copy
-      ${CMAKE_BINARY_DIR}/third_party/MemProcFs/vmm.dll
+      ${CMAKE_BINARY_DIR}/third_party/Source/MemProcFs/vmm.dll
       ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}/vmm.dll)
 else()
 

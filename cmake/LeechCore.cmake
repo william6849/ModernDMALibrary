@@ -1,6 +1,6 @@
 include(ExternalProject)
 
-set(ROOT_DIR ${CMAKE_BINARY_DIR}/third_party/LeechCore)
+set_directory_properties(PROPERTIES EP_BASE ${CMAKE_BINARY_DIR}/third_party)
 
 if(WIN32)
   set(URL
@@ -27,9 +27,6 @@ message("Get: " ${URL})
 ExternalProject_Add(
   LeechCore
   URL ${URL}
-  PREFIX ${CMAKE_BINARY_DIR}
-  SOURCE_DIR ${ROOT_DIR}
-  BINARY_DIR ${ROOT_DIR}
   BUILD_COMMAND ""
   CONFIGURE_COMMAND ""
   INSTALL_COMMAND "")

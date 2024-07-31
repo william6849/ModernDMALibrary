@@ -3,7 +3,7 @@ file(GLOB_RECURSE HEADER_FILES "*.h")
 
 set(ROOT_DIR ${CMAKE_SOURCE_DIR}/MordenDMALibrary)
 set(TARGET_LIBRARY_NAME MDMAL)
-
+set(BUILD_SHARED_LIBS)
 if(BUILD_SHARED_LIBS)
   add_library(${TARGET_LIBRARY_NAME} SHARED ${SOURCE_FILES})
   target_compile_definitions(${TARGET_LIBRARY_NAME}
@@ -23,31 +23,31 @@ target_include_directories(
   PRIVATE ${CMAKE_SOURCE_DIR}/libusb-cmake/libusb/libusb
           ${CMAKE_SOURCE_DIR}/spdlog/include
           ${CMAKE_SOURCE_DIR}/googletest/googletest/include
-          ${CMAKE_BINARY_DIR}/third_party/LeechCore
-          ${CMAKE_BINARY_DIR}/third_party/MemProcFS)
+          ${CMAKE_BINARY_DIR}/third_party/Source/LeechCore
+          ${CMAKE_BINARY_DIR}/third_party/Source/MemProcFS)
 
 add_library(leechcore SHARED IMPORTED)
 if(WIN32)
   set_property(
     TARGET leechcore
     PROPERTY IMPORTED_IMPLIB
-             ${CMAKE_BINARY_DIR}/third_party/LeechCore/leechcore.lib)
+             ${CMAKE_BINARY_DIR}/third_party/Source/LeechCore/leechcore.lib)
 else()
   set_property(
     TARGET leechcore
     PROPERTY IMPORTED_LOCATION
-             ${CMAKE_BINARY_DIR}/third_party/LeechCore/leechcore.so)
+             ${CMAKE_BINARY_DIR}/third_party/Source/LeechCore/leechcore.so)
 endif()
 
 add_library(memprocfs SHARED IMPORTED)
 if(WIN32)
   set_property(
     TARGET memprocfs PROPERTY IMPORTED_IMPLIB
-                              ${CMAKE_BINARY_DIR}/third_party/MemProcFS/vmm.lib)
+                              ${CMAKE_BINARY_DIR}/third_party/Source/MemProcFS/vmm.lib)
 else()
   set_property(
     TARGET memprocfs PROPERTY IMPORTED_LOCATION
-                              ${CMAKE_BINARY_DIR}/third_party/MemProcFS/vmm.so)
+                              ${CMAKE_BINARY_DIR}/third_party/Source/MemProcFS/vmm.so)
 endif()
 
 if(WIN32)
