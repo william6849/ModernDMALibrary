@@ -17,8 +17,10 @@ target_include_directories(
   ${TARGET_LIBRARY_NAME}
   PUBLIC $<INSTALL_INTERFACE:include>
          $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
-          ${CMAKE_SOURCE_DIR}/libusb-cmake/libusb/libusb
+  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_include_directories(
+  ${TARGET_LIBRARY_NAME} SYSTEM
+  PRIVATE ${CMAKE_SOURCE_DIR}/libusb-cmake/libusb/libusb
           ${CMAKE_SOURCE_DIR}/spdlog/include
           ${CMAKE_SOURCE_DIR}/googletest/googletest/include
           ${CMAKE_BINARY_DIR}/third_party/LeechCore
@@ -40,9 +42,8 @@ endif()
 add_library(memprocfs SHARED IMPORTED)
 if(WIN32)
   set_property(
-    TARGET memprocfs
-    PROPERTY IMPORTED_IMPLIB
-             ${CMAKE_BINARY_DIR}/third_party/LeechCore/leechcore.lib)
+    TARGET memprocfs PROPERTY IMPORTED_IMPLIB
+                              ${CMAKE_BINARY_DIR}/third_party/MemProcFS/vmm.lib)
 else()
   set_property(
     TARGET memprocfs PROPERTY IMPORTED_LOCATION
@@ -53,11 +54,9 @@ if(WIN32)
   set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif()
 
-target_link_libraries(${TARGET_LIBRARY_NAME} leechcore)
-target_link_libraries(${TARGET_LIBRARY_NAME} memprocfs)
+target_link_libraries(${TARGET_LIBRARY_NAME} PRIVATE leechcore)
+target_link_libraries(${TARGET_LIBRARY_NAME} PRIVATE memprocfs)
 
-add_dependencies(${TARGET_LIBRARY_NAME} LeechCore)
-add_dependencies(${TARGET_LIBRARY_NAME} MemProcFS)
 add_dependencies(${TARGET_LIBRARY_NAME} usb-1.0)
 add_dependencies(${TARGET_LIBRARY_NAME} spdlog)
 
