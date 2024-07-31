@@ -33,16 +33,16 @@ set(gtest_force_shared_crt
 
 # Spdlog
 add_subdirectory(spdlog)
-if(CMAKE_COMPILER_IS_GNUCC)
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  target_compile_options(spdlog PRIVATE --no-warnings)
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   target_compile_options(spdlog PRIVATE -w)
-endif()
-if(MSVC)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
   target_compile_options(spdlog PRIVATE /W0)
 endif()
 
 # Libusb
 add_subdirectory(libusb-cmake)
-link_directories(${CMAKE_BINARY_DIR}/libusb-cmake)
 
 add_subdirectory(MordenDMALibrary)
 add_subdirectory(examples)
