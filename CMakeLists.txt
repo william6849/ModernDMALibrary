@@ -19,7 +19,7 @@ option(BUILD_SHARED_LIBS
        "Specifies the type of libraries (SHARED or STATIC) to build" OFF)
 
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-  set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/install/morden_dma_library")
+  set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/install/MordenDMALibrary")
 endif()
 
 if(WIN32)
