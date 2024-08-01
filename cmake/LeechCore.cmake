@@ -26,8 +26,8 @@ message(VERBOSE "Target Release: " ${RELEASE_URL})
 ExternalProject_Add(
   LeechCore
   URL ${RELEASE_URL}
-  BUILD_COMMAND ""
   CONFIGURE_COMMAND ""
+  BUILD_COMMAND ""
   INSTALL_COMMAND "")
 
 ExternalProject_Get_Property(LeechCore SOURCE_DIR)

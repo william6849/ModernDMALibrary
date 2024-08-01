@@ -21,13 +21,13 @@ else()
 endif()
 
 message("Fetch MemProcFS Release")
-message(VERBOSE "Target Release: " ${URL})
+message(VERBOSE "Target Release: " ${RELEASE_URL})
 
 ExternalProject_Add(
   MemProcFS
   URL ${RELEASE_URL}
-  BUILD_COMMAND ""
   CONFIGURE_COMMAND ""
+  BUILD_COMMAND ""
   INSTALL_COMMAND "")
 
 ExternalProject_Get_Property(MemProcFS SOURCE_DIR)
