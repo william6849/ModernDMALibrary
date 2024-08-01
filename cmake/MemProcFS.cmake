@@ -29,3 +29,23 @@ ExternalProject_Add(
   BUILD_COMMAND ""
   CONFIGURE_COMMAND ""
   INSTALL_COMMAND "")
+
+ExternalProject_Get_Property(MemProcFS SOURCE_DIR)
+set(MEMPROCFS_RESOURCE_DIR ${SOURCE_DIR})
+
+file(GLOB MEMPROCFS_HEADER_LIST ${SOURCE_DIR}/*.h)
+if(WIN32)
+  file(GLOB MEMPROCFS_LIB_LIST ${SOURCE_DIR}/*.lib)
+  file(GLOB MEMPROCFS_SHARED_LIST ${SOURCE_DIR}/*.dll)
+else()
+  file(GLOB MEMPROCFS_SHARED_LIST ${SOURCE_DIR}/*.so)
+endif()
+
+add_library(memprocfslib SHARED IMPORTED)
+add_dependencies(memprocfslib MemProcFS)
+if(WIN32)
+  set_property(TARGET memprocfslib PROPERTY IMPORTED_IMPLIB
+                                            ${MEMPROCFS_RESOURCE_DIR}/vmm.lib)
+endif()
+set_property(TARGET memprocfslib PROPERTY IMPORTED_LOCATION
+                                          ${MEMPROCFS_SHARED_LIST})

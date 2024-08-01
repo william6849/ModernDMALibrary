@@ -29,3 +29,23 @@ ExternalProject_Add(
   BUILD_COMMAND ""
   CONFIGURE_COMMAND ""
   INSTALL_COMMAND "")
+
+ExternalProject_Get_Property(LeechCore SOURCE_DIR)
+set(LEECHCORE_RESOURCE_DIR ${SOURCE_DIR})
+
+file(GLOB LEECHCORE_HEADER_LIST ${SOURCE_DIR}/*.h)
+if(WIN32)
+  file(GLOB LEECHCORE_LIB_LIST ${SOURCE_DIR}/*.lib)
+  file(GLOB LEECHCORE_SHARED_LIST ${SOURCE_DIR}/*.dll)
+else()
+  file(GLOB LEECHCORE_SHARED_LIST ${SOURCE_DIR}/*.so)
+endif()
+
+add_library(leechcorelib SHARED IMPORTED)
+add_dependencies(leechcorelib LeechCore)
+if(WIN32)
+  set_property(TARGET leechcorelib
+               PROPERTY IMPORTED_IMPLIB ${LEECHCORE_RESOURCE_DIR}/leechcore.lib)
+endif()
+set_property(TARGET leechcorelib PROPERTY IMPORTED_LOCATION
+                                          ${LEECHCORE_SHARED_LIST})
