@@ -12,6 +12,13 @@ else()
   add_library(${TARGET_LIBRARY_NAME} STATIC ${SOURCE_FILES})
 endif()
 
+if(WIN32)
+  target_compile_definitions(${TARGET_LIBRARY_NAME} PRIVATE WIN32_LEAN_AND_MEAN
+                                                            NTSTATUS=LONG)
+else()
+  target_compile_definitions(${TARGET_LIBRARY_NAME} PRIVATE LINUX)
+endif()
+
 target_include_directories(
   ${TARGET_LIBRARY_NAME}
   PUBLIC $<INSTALL_INTERFACE:include>

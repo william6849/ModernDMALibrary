@@ -13,6 +13,17 @@
                 "type": "equals",
                 "lhs": "${hostSystemName}",
                 "rhs": "Windows"
+            },
+            "cacheVariables": {
+                "CMAKE_CONFIGURATION_TYPES": "Release;Debug"
+            },
+            "vendor": {
+                "microsoft.com/VisualStudioSettings/CMake/1.0": {
+                    "hostOS": [
+                        "Windows"
+                    ],
+                    "intelliSenseMode": "windows-msvc-x64"
+                }
             }
         },
         {

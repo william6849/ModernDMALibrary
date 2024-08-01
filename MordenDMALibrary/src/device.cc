@@ -1,7 +1,5 @@
 #include "device.h"
 
-#include <Windows.h>
-
 #include "spdlog/spdlog.h"
 #include "vmmdll.h"
 
