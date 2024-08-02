@@ -27,9 +27,9 @@ target_include_directories(
           ${MEMPROCFS_RESOURCE_DIR})
 target_include_directories(
   ${TARGET_LIBRARY_NAME} SYSTEM
-  PRIVATE ${CMAKE_SOURCE_DIR}/libusb-cmake/libusb/libusb
-          ${CMAKE_SOURCE_DIR}/spdlog/include
-          ${CMAKE_SOURCE_DIR}/googletest/googletest/include)
+  PRIVATE ${CMAKE_SOURCE_DIR}/submodules/libusb-cmake/libusb/libusb
+          ${CMAKE_SOURCE_DIR}/submodules/spdlog/include
+          ${CMAKE_SOURCE_DIR}/submodules/googletest/googletest/include)
 
 add_library(third_party_libs INTERFACE IMPORTED)
 set_property(TARGET third_party_libs PROPERTY INTERFACE_LINK_LIBRARIES
