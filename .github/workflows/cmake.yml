@@ -1,0 +1,21 @@
+name: CMake test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+
+    steps:
+    - uses: lukka/get-cmake@latest
+
+    - name: Run CMake consuming CMakePreset.json on Linux
+      uses: lukka/run-cmake@v10
+      with:
+        configurePreset: 'unixlike-gcc-debug'
