@@ -15,9 +15,7 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/install/MordenDMALibrary")
 endif()
 
-# Third party library
-include(cmake/LeechCore.cmake)
-include(cmake/MemProcFS.cmake)
+add_subdirectory(cmake)
 
 add_subdirectory(submodules)
 add_subdirectory(MordenDMALibrary)
