@@ -1,4 +1,4 @@
-name: CMake test
+name: CMake configuration
 
 on:
   push:
@@ -7,15 +7,48 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  linux:
+    name: "${{ matrix.os }}-${{ github.workflow }}"
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
-
+      matrix:
+        build_type: [release, debug]
+        os: [ubuntu-latest]
+        compiler: [gcc, clang]
+    
     steps:
-    - uses: lukka/get-cmake@latest
+      - uses: actions/checkout@main
+        with:
+          submodules: true
+      
+      - uses: lukka/get-cmake@latest
+      
+      - name: Run CMake consuming CMakePreset.json on Linux
+        uses: lukka/run-cmake@v10
+        with:
+          configurePreset: unixlike-${{ matrix.compiler }}-${{ matrix.build_type }}
+          
+  windows:
+    name: ${{matrix.os}}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Release, Debug]
+        os: [windows-latest]
+        vs_version: [2019, 2022]
+        platforms: [x64]
+    
+    steps:
+      - uses: actions/checkout@main
+        with:
+          submodules: true
+      
+      - uses: lukka/get-cmake@latest
 
-    - name: Run CMake consuming CMakePreset.json on Linux
-      uses: lukka/run-cmake@v10
-      with:
-        configurePreset: 'unixlike-gcc-debug'
+      - name: Run CMake consuming CMakePreset.json on Windows
+        uses: lukka/run-cmake@v10
+        with:
+          configurePreset: vs${{ matrix.vs_version }}-${{ matrix.platforms }}-${{ matrix.build_type }}
+      
