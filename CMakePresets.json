@@ -13,16 +13,40 @@
       "installDir": "${sourceDir}/install/${presetName}"
     },
     {
+      "name": "debug",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CONFIGURATION_TYPES": "Debug"
+      }
+    },
+    {
+      "name": "release",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CONFIGURATION_TYPES": "Release"
+      }
+    },
+    {
+      "name": "vs-release",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CONFIGURATION_TYPES": "Release"
+      }
+    },
+    {
       "name": "windows-base",
       "hidden": true,
       "inherits": "common-base",
+      "architecture": {
+        "value": "x64"
+      },
       "condition": {
         "type": "equals",
         "lhs": "${hostSystemName}",
         "rhs": "Windows"
-      },
-      "cacheVariables": {
-        "CMAKE_CONFIGURATION_TYPES": "Release;Debug"
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {
@@ -34,64 +58,46 @@
       }
     },
     {
-      "name": "vs-2022",
-      "hidden": true,
-      "inherits": "windows-base",
-      "generator": "Visual Studio 17 2022"
-    },
-    {
-      "name": "windows-2022-x64-release",
-      "displayName": "Visual Studio 2022 x64 Release",
-      "inherits": "vs-2022",
-      "architecture": {
-        "value": "x64"
-      },
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_CONFIGURATION_TYPES": "Release"
-      }
-    },
-    {
-      "name": "windows-2022-x64-debug",
-      "displayName": "Visual Studio 2022 x64 Debug",
-      "inherits": "vs-2022",
-      "architecture": {
-        "value": "x64"
-      },
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_CONFIGURATION_TYPES": "Debug"
-      }
-    },
-    {
       "name": "vs-2019",
       "hidden": true,
-      "inherits": "windows-base",
       "generator": "Visual Studio 16 2019"
     },
     {
-      "name": "windows-2019-x64-release",
-      "displayName": "Visual Studio 2019 x64 Release",
-      "inherits": "vs-2019",
-      "architecture": {
-        "value": "x64"
-      },
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_CONFIGURATION_TYPES": "Release"
-      }
+      "name": "vs-2022",
+      "hidden": true,
+      "generator": "Visual Studio 17 2022"
     },
     {
       "name": "windows-2019-x64-debug",
-      "displayName": "Visual Studio 2019 x64 Debug",
-      "inherits": "vs-2019",
-      "architecture": {
-        "value": "x64"
-      },
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_CONFIGURATION_TYPES": "Debug"
-      }
+      "inherits": [
+        "windows-base",
+        "vs-2019",
+        "debug"
+      ]
+    },
+    {
+      "name": "windows-2019-x64-release",
+      "inherits": [
+        "windows-base",
+        "vs-2019",
+        "vs-release"
+      ]
+    },
+    {
+      "name": "windows-2022-x64-debug",
+      "inherits": [
+        "windows-base",
+        "vs-2022",
+        "debug"
+      ]
+    },
+    {
+      "name": "windows-2022-x64-release",
+      "inherits": [
+        "windows-base",
+        "vs-2022",
+        "vs-release"
+      ]
     },
     {
       "name": "conf-unixlike-common",
@@ -108,48 +114,122 @@
       }
     },
     {
+      "name": "gcc",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "gcc",
+        "CMAKE_CXX_COMPILER": "g++"
+      }
+    },
+    {
+      "name": "clang",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++"
+      }
+    },
+    {
       "name": "unixlike-gcc-debug",
       "displayName": "gcc Debug",
       "description": "Target Unix-like OS with the gcc compiler, debug build type",
-      "inherits": "conf-unixlike-common",
-      "cacheVariables": {
-        "CMAKE_C_COMPILER": "gcc",
-        "CMAKE_CXX_COMPILER": "g++",
-        "CMAKE_BUILD_TYPE": "Debug"
-      }
+      "inherits": [
+        "conf-unixlike-common",
+        "gcc",
+        "debug"
+      ]
     },
     {
       "name": "unixlike-gcc-release",
       "displayName": "gcc Release",
       "description": "Target Unix-like OS with the gcc compiler, release build type",
-      "inherits": "conf-unixlike-common",
-      "cacheVariables": {
-        "CMAKE_C_COMPILER": "gcc",
-        "CMAKE_CXX_COMPILER": "g++",
-        "CMAKE_BUILD_TYPE": "Release"
-      }
+      "inherits": [
+        "conf-unixlike-common",
+        "gcc",
+        "release"
+      ]
     },
     {
       "name": "unixlike-clang-debug",
       "displayName": "clang Debug",
       "description": "Target Unix-like OS with the clang compiler, debug build type",
-      "inherits": "conf-unixlike-common",
-      "cacheVariables": {
-        "CMAKE_C_COMPILER": "clang",
-        "CMAKE_CXX_COMPILER": "clang++",
-        "CMAKE_BUILD_TYPE": "Debug"
-      }
+      "inherits": [
+        "conf-unixlike-common",
+        "clang",
+        "debug"
+      ]
     },
     {
       "name": "unixlike-clang-release",
       "displayName": "clang Release",
       "description": "Target Unix-like OS with the clang compiler, release build type",
-      "inherits": "conf-unixlike-common",
-      "cacheVariables": {
-        "CMAKE_C_COMPILER": "clang",
-        "CMAKE_CXX_COMPILER": "clang++",
-        "CMAKE_BUILD_TYPE": "Release"
-      }
+      "inherits": [
+        "conf-unixlike-common",
+        "clang",
+        "release"
+      ]
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "unixlike-gcc-debug",
+      "displayName": "Unixlike gcc x64 Debug",
+      "cleanFirst": true,
+      "configurePreset": "unixlike-gcc-debug"
+    },
+    {
+      "name": "unixlike-gcc-release",
+      "displayName": "Unixlike gcc x64 Release",
+      "cleanFirst": true,
+      "configurePreset": "unixlike-gcc-release"
+    },
+    {
+      "name": "unixlike-clang-debug",
+      "displayName": "Unixlike clang x64 Debug",
+      "cleanFirst": true,
+      "configurePreset": "unixlike-clang-debug"
+    },
+    {
+      "name": "unixlike-clang-release",
+      "displayName": "Unixlike clang x64 Release",
+      "cleanFirst": true,
+      "configurePreset": "unixlike-clang-release"
+    },
+    {
+      "name": "windows-2019-x64-debug",
+      "displayName": "Visual Studio 2019 x64 Debug",
+      "cleanFirst": true,
+      "configurePreset": "windows-2019-x64-debug",
+      "nativeToolOptions": [
+        "-p:Configuration=Debug"
+      ]
+    },
+    {
+      "name": "windows-2019-x64-release",
+      "displayName": "Visual Studio 2019 x64 Release",
+      "cleanFirst": true,
+      "configurePreset": "windows-2019-x64-release",
+      "nativeToolOptions": [
+        "-p:Configuration=Release"
+      ]
+    },
+    {
+      "name": "windows-2022-x64-debug",
+      "displayName": "Visual Studio 2022 x64 Debug",
+      "cleanFirst": true,
+      "configurePreset": "windows-2022-x64-debug",
+      "nativeToolOptions": [
+        "-p:Configuration=Debug"
+      ]
+    },
+    {
+      "name": "windows-2022-x64-release",
+      "displayName": "Visual Studio 2022 x64 Release",
+      "cleanFirst": true,
+      "configurePreset": "windows-2022-x64-release",
+      "nativeToolOptions": [
+        "-p:Configuration=Release"
+      ]
     }
   ]
 }

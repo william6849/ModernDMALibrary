@@ -48,4 +48,5 @@ jobs:
         uses: lukka/run-cmake@v10
         with:
           configurePreset: ${{ matrix.os }}-${{ matrix.platforms }}-${{ matrix.build_type }}
+          buildPreset: ${{ matrix.os }}-${{ matrix.platforms }}-${{ matrix.build_type }}
       
