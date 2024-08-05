@@ -7,8 +7,15 @@
     },
     "configurePresets": [
         {
+            "name": "common-base",
+            "hidden": true,
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "installDir": "${sourceDir}/install/${presetName}"
+        },
+        {
             "name": "windows-base",
             "hidden": true,
+            "inherits": "common-base",
             "condition": {
                 "type": "equals",
                 "lhs": "${hostSystemName}",
@@ -33,11 +40,9 @@
             "generator": "Visual Studio 17 2022"
         },
         {
-            "name": "vs2022-x64-Release",
+            "name": "windows-2022-x64-release",
             "displayName": "Visual Studio 2022 x64 Release",
             "inherits": "vs-2022",
-            "binaryDir": "${sourceDir}/build/x64-Release",
-            "installDir": "${sourceDir}/install/x64-Release",
             "architecture": {
                 "value": "x64"
             },
@@ -47,11 +52,9 @@
             }
         },
         {
-            "name": "vs2022-x64-Debug",
+            "name": "windows-2022-x64-debug",
             "displayName": "Visual Studio 2022 x64 Debug",
             "inherits": "vs-2022",
-            "binaryDir": "${sourceDir}/build/x64-Debug",
-            "installDir": "${sourceDir}/install/x64-Debug",
             "architecture": {
                 "value": "x64"
             },
@@ -67,11 +70,9 @@
             "generator": "Visual Studio 16 2019"
         },
         {
-            "name": "vs2019-x64-Release",
+            "name": "windows-2019-x64-release",
             "displayName": "Visual Studio 2019 x64 Release",
             "inherits": "vs-2019",
-            "binaryDir": "${sourceDir}/build/x64-Release",
-            "installDir": "${sourceDir}/install/x64-Release",
             "architecture": {
                 "value": "x64"
             },
@@ -81,11 +82,9 @@
             }
         },
         {
-            "name": "vs2019-x64-Debug",
+            "name": "windows-2019-x64-debug",
             "displayName": "Visual Studio 2019 x64 Debug",
             "inherits": "vs-2019",
-            "binaryDir": "${sourceDir}/build/x64-Debug",
-            "installDir": "${sourceDir}/install/x64-Debug",
             "architecture": {
                 "value": "x64"
             },
@@ -98,8 +97,7 @@
             "name": "conf-unixlike-common",
             "description": "Unix-like OS settings for gcc and clang toolchains",
             "hidden": true,
-            "binaryDir": "${sourceDir}/build/${presetName}",
-            "installDir": "${sourceDir}/install/${presetName}",
+            "inherits": "common-base",
             "condition": {
                 "type": "inList",
                 "string": "${hostSystemName}",

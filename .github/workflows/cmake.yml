@@ -1,5 +1,5 @@
-name: CMake configuration
-
+name: CMake build test
+run-name: 
 on:
   push:
     branches: [ "main" ]
@@ -7,8 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  linux:
-    name: "${{ matrix.os }}-${{ github.workflow }}"
+  Unixlike:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -19,36 +18,30 @@ jobs:
     
     steps:
       - uses: actions/checkout@main
-        with:
-          submodules: true
       
       - uses: lukka/get-cmake@latest
       
-      - name: Run CMake consuming CMakePreset.json on Linux
+      - name: Configure CMake
         uses: lukka/run-cmake@v10
         with:
           configurePreset: unixlike-${{ matrix.compiler }}-${{ matrix.build_type }}
           
-  windows:
-    name: ${{matrix.os}}
+  Windows:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        build_type: [Release, Debug]
-        os: [windows-latest]
-        vs_version: [2019, 2022]
+        build_type: [release, debug]
+        os: [windows-2019, windows-2022]
         platforms: [x64]
     
     steps:
       - uses: actions/checkout@main
-        with:
-          submodules: true
-      
+
       - uses: lukka/get-cmake@latest
 
-      - name: Run CMake consuming CMakePreset.json on Windows
+      - name: Configure CMake
         uses: lukka/run-cmake@v10
         with:
-          configurePreset: vs${{ matrix.vs_version }}-${{ matrix.platforms }}-${{ matrix.build_type }}
+          configurePreset: ${{ matrix.os }}-${{ matrix.platforms }}-${{ matrix.build_type }}
       
