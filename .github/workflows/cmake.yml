@@ -1,5 +1,4 @@
 name: CMake build test
-run-name: 
 on:
   push:
     branches: [ "main" ]
