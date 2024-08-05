@@ -15,4 +15,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
 endif()
 
 # Libusb
+if(LINUX)
+  find_file(NAMES libudev.h PATHS /usr/include REQUIRED)
+endif()
 init_git_submodule(${CMAKE_CURRENT_SOURCE_DIR}/libusb-cmake)

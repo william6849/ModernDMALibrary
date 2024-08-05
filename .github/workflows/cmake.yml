@@ -19,6 +19,11 @@ jobs:
       - uses: actions/checkout@main
       
       - uses: lukka/get-cmake@latest
+
+      - name: Install dependency
+        run: |
+          sudo apt-get update
+          sudo apt install libudev-dev
       
       - name: Configure CMake
         uses: lukka/run-cmake@v10
