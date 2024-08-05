@@ -23,22 +23,19 @@ target_include_directories(
   ${TARGET_LIBRARY_NAME}
   PUBLIC $<INSTALL_INTERFACE:include>
          $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src ${LEECHCORE_RESOURCE_DIR}
-          ${MEMPROCFS_RESOURCE_DIR})
+  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
+          ${CMAKE_BINARY_DIR}/third_party/Source/LeechCore
+          ${CMAKE_BINARY_DIR}/third_party/Source/MemProcFS)
+
 target_include_directories(
   ${TARGET_LIBRARY_NAME} SYSTEM
   PRIVATE ${CMAKE_SOURCE_DIR}/submodules/libusb-cmake/libusb/libusb
           ${CMAKE_SOURCE_DIR}/submodules/spdlog/include
           ${CMAKE_SOURCE_DIR}/submodules/googletest/googletest/include)
-
 add_library(third_party_libs INTERFACE IMPORTED)
 set_property(TARGET third_party_libs PROPERTY INTERFACE_LINK_LIBRARIES
                                               leechcorelib memprocfslib)
 target_link_libraries(${TARGET_LIBRARY_NAME} PRIVATE third_party_libs)
-
-if(WIN32)
-  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-endif()
 
 add_dependencies(${TARGET_LIBRARY_NAME} usb-1.0)
 add_dependencies(${TARGET_LIBRARY_NAME} spdlog)

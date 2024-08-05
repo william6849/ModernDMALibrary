@@ -33,7 +33,7 @@ ExternalProject_Add(
 ExternalProject_Get_Property(LeechCore SOURCE_DIR)
 set(LEECHCORE_RESOURCE_DIR ${SOURCE_DIR})
 
-add_library(leechcorelib SHARED IMPORTED)
+add_library(leechcorelib SHARED IMPORTED GLOBAL)
 add_dependencies(leechcorelib LeechCore)
 set_property(TARGET leechcorelib
              PROPERTY IMPORTED_IMPLIB ${LEECHCORE_RESOURCE_DIR}/leechcore.lib)

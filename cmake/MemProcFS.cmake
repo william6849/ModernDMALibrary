@@ -33,7 +33,7 @@ ExternalProject_Add(
 ExternalProject_Get_Property(MemProcFS SOURCE_DIR)
 set(MEMPROCFS_RESOURCE_DIR ${SOURCE_DIR})
 
-add_library(memprocfslib SHARED IMPORTED)
+add_library(memprocfslib SHARED IMPORTED GLOBAL)
 add_dependencies(memprocfslib MemProcFS)
 set_property(TARGET memprocfslib PROPERTY IMPORTED_IMPLIB
                                           ${MEMPROCFS_RESOURCE_DIR}/vmm.lib)
