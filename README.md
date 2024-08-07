@@ -1,6 +1,6 @@
  > This is ***work in progress***, so please don’t use it until the first release.  
 
-[![CMake build](https://github.com/william6849/MordenDMALibrary/actions/workflows/cmake.yml/badge.svg?branch=main)](https://github.com/william6849/MordenDMALibrary/actions/workflows/cmake.yml)   [![Codacy](https://app.codacy.com/project/badge/Grade/e2d0d9f97a7d4ae2bd84ea39e2876867)](https://app.codacy.com/gh/william6849/MordenDMALibrary/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![CMake build](https://github.com/william6849/MordenDMALibrary/actions/workflows/cmake.yml/badge.svg?branch=main)](https://github.com/william6849/MordenDMALibrary/actions/workflows/cmake.yml)   [![Codacy](https://app.codacy.com/project/badge/Grade/f1e64783d87e4404b248f8cf20b6073a)](https://app.codacy.com/gh/william6849/MordenDMALibrary/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
 # MordenDMALibrary
 I have a MacBook and a PC running Linux, but I don’t want to reboot my secondary PC whenever I want to use DMA.  
