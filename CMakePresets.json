@@ -168,6 +168,16 @@
         "clang",
         "release"
       ]
+    },
+    {
+      "name": "unixlike-clang-tidy",
+      "displayName": "clang tidy",
+      "inherits": [
+        "unixlike-clang-debug"
+      ],
+      "cacheVariables": {
+        "RUN_CLANG_TIDY_ON_TARGET": "TRUE"
+      }
     }
   ],
   "buildPresets": [
@@ -194,6 +204,12 @@
       "displayName": "Unixlike clang x64 Release",
       "cleanFirst": true,
       "configurePreset": "unixlike-clang-release"
+    },
+    {
+      "name": "unixlike-clang-tidy",
+      "displayName": "Analyze clang-tidy",
+      "cleanFirst": true,
+      "configurePreset": "unixlike-clang-tidy"
     },
     {
       "name": "windows-2019-x64-debug",

@@ -40,6 +40,12 @@ target_link_libraries(${TARGET_LIBRARY_NAME} PRIVATE third_party_libs)
 add_dependencies(${TARGET_LIBRARY_NAME} usb-1.0)
 add_dependencies(${TARGET_LIBRARY_NAME} spdlog)
 
+if(RUN_CLANG_TIDY_ON_TARGET)
+  set_target_properties(
+    ${TARGET_LIBRARY_NAME} PROPERTIES CXX_CLANG_TIDY "clang-tidy;-checks=*"
+                                      EXPORT_COMPILE_COMMANDS "ON")
+endif()
+
 # install settings
 install(
   TARGETS ${TARGET_LIBRARY_NAME}

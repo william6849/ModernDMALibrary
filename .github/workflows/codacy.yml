@@ -5,14 +5,25 @@ on: ["push"]
 jobs:
   codacy-analysis-cli:
     name: Codacy Analysis CLI
-    runs-on: ubuntu-latest
+    runs-on: DMAHostRunner
     steps:
       - name: Checkout code
         uses: actions/checkout@main
+     
+      - name: Configure Clang-tidy Preset
+        uses: lukka/run-cmake@v10
+        with:
+          configurePreset: unixlike-clang-tidy
+
+      - name: Run clang-tidy
+        run: |
+          cd build
+          run-clang-tidy -p ./unixlike-clang-tidy | tee clang-tidy-output.txt
+          cd -
 
       - name: Run Codacy Analysis CLI
         uses: codacy/codacy-analysis-cli-action@master
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          clang-tidy-output: "analyze/clang-tidy-output"
+          clang-tidy-output: "build/clang-tidy-output.txt"
           upload: true
