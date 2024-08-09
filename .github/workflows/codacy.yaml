@@ -27,4 +27,5 @@ jobs:
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
           clang-tidy-output: "build/clang-tidy-output.txt"
+          run-docker-tools: "false"
           upload: true
