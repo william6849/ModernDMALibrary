@@ -1,4 +1,4 @@
-name: CMake build test
+name: CMake Build
 on:
   push:
     branches: [ "main" ]
