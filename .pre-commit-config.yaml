@@ -3,6 +3,9 @@ repos:
   rev: v4.6.0
   hooks:
   - id: check-yaml
+  - id: check-json
+  - id: check-merge-conflict
+  - id: end-of-file-fixer
   
 - repo: https://github.com/rhysd/actionlint
   rev: v1.7.1
@@ -14,3 +17,4 @@ repos:
   hooks:
   - id: clang-format
     args: ["-style=Google"]
+    types_or: [c++, c]
