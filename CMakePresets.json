@@ -184,7 +184,6 @@
     {
       "name": "unixlike-gcc-debug",
       "displayName": "Unixlike gcc x64 Debug",
-      "cleanFirst": true,
       "configurePreset": "unixlike-gcc-debug"
     },
     {
@@ -196,7 +195,6 @@
     {
       "name": "unixlike-clang-debug",
       "displayName": "Unixlike clang x64 Debug",
-      "cleanFirst": true,
       "configurePreset": "unixlike-clang-debug"
     },
     {
@@ -214,7 +212,6 @@
     {
       "name": "windows-2019-x64-debug",
       "displayName": "Visual Studio 2019 x64 Debug",
-      "cleanFirst": true,
       "configurePreset": "windows-2019-x64-debug",
       "nativeToolOptions": [
         "-p:Configuration=Debug"
@@ -232,7 +229,6 @@
     {
       "name": "windows-2022-x64-debug",
       "displayName": "Visual Studio 2022 x64 Debug",
-      "cleanFirst": true,
       "configurePreset": "windows-2022-x64-debug",
       "nativeToolOptions": [
         "-p:Configuration=Debug"
