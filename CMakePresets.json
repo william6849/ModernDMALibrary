@@ -170,12 +170,13 @@
       ]
     },
     {
-      "name": "unixlike-clang-tidy",
-      "displayName": "clang tidy",
+      "name": "code-analysis",
+      "displayName": "Code Analysis",
       "inherits": [
-        "unixlike-clang-debug"
+        "unixlike-gcc-debug"
       ],
       "cacheVariables": {
+        "CODE_COVERAGE": "ON",
         "RUN_CLANG_TIDY_ON_TARGET": "TRUE"
       }
     }
@@ -204,10 +205,10 @@
       "configurePreset": "unixlike-clang-release"
     },
     {
-      "name": "unixlike-clang-tidy",
-      "displayName": "Analyze clang-tidy",
+      "name": "code-analysis",
+      "displayName": "Code Analysis",
       "cleanFirst": true,
-      "configurePreset": "unixlike-clang-tidy"
+      "configurePreset": "code-analysis"
     },
     {
       "name": "windows-2019-x64-debug",

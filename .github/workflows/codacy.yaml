@@ -9,7 +9,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@main
-     
+
       - name: Configure Clang-tidy Preset
         uses: lukka/run-cmake@v10
         with:
@@ -19,7 +19,7 @@ jobs:
       - name: Run clang-tidy
         run: |
           cd build
-          run-clang-tidy -p ./unixlike-clang-tidy | tee clang-tidy-output.txt
+          run-clang-tidy -p ./code-analysis | tee clang-tidy-output.txt
           cd -
 
       - name: Run Codacy Analysis CLI
