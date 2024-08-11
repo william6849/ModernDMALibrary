@@ -26,4 +26,5 @@ add_subdirectory(cmake)
 
 add_subdirectory(submodules)
 add_subdirectory(MordenDMALibrary)
+add_subdirectory(unittest)
 add_subdirectory(examples)
