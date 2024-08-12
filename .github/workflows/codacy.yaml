@@ -1,20 +1,20 @@
-name: Codacy Analysis CLI
+name: Codacy Analysis
 
 on: ["push"]
 
 jobs:
-  codacy-analysis-cli:
-    name: Codacy Analysis CLI
+  code-analysis:
+    name: Code Analysis
     runs-on: DMAHostRunner
     steps:
       - name: Checkout code
         uses: actions/checkout@main
 
-      - name: Configure Clang-tidy Preset
+      - name: Configure code-analysis Preset
         uses: lukka/run-cmake@v10
         with:
-          configurePreset: unixlike-clang-tidy
-          buildPreset: unixlike-clang-tidy
+          configurePreset: code-analysis
+          buildPreset: code-analysis
 
       - name: Run clang-tidy
         run: |
@@ -28,3 +28,22 @@ jobs:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
           clang-tidy-output: "build/clang-tidy-output.txt"
           upload: true
+
+      - name: Run Unit Test
+        run: |
+          cd ./build/code-analysis/bin/
+          ./dmatest
+          cd -
+
+      - name: Generate coverage info
+        run: |
+          cd ./build/code-analysis
+          lcov --capture --directory . --output-file coverage.info
+          lcov --ignore-errors unused --remove coverage.info '/usr/include/*' 'submodules' 'googletest' -o filtered_coverage.info
+          cd -
+
+      - name: Run codacy-coverage-reporter
+        uses: codacy/codacy-coverage-reporter-action@v1.3.0
+        with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          coverage-reports: ./build/code-analysis/filtered_coverage.info
