@@ -42,3 +42,13 @@ set_property(
   TARGET leechcorelib
   PROPERTY IMPORTED_LOCATION
            ${LEECHCORE_RESOURCE_DIR}/leechcore${CMAKE_SHARED_LIBRARY_SUFFIX})
+
+if(WIN32)
+  add_custom_command(
+    TARGET LeechCore
+    POST_BUILD
+    COMMAND
+      ${CMAKE_COMMAND} -E copy_if_different
+      ${CMAKE_BINARY_DIR}/third_party/Source/LeechCore/leechcore.dll
+      ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/leechcore.dll)
+endif()

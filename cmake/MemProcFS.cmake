@@ -41,3 +41,12 @@ set_property(
   TARGET memprocfslib
   PROPERTY IMPORTED_LOCATION
            ${MEMPROCFS_RESOURCE_DIR}/vmm${CMAKE_SHARED_LIBRARY_SUFFIX})
+if(WIN32)
+  add_custom_command(
+    TARGET MemProcFS
+    POST_BUILD
+    COMMAND
+      ${CMAKE_COMMAND} -E copy_if_different
+      ${CMAKE_BINARY_DIR}/third_party/Source/MemProcFs/vmm.dll
+      ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/vmm.dll)
+endif()
