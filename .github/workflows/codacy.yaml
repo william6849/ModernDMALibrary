@@ -11,7 +11,7 @@ jobs:
         uses: actions/checkout@main
 
       - name: Configure code-analysis Preset
-        uses: lukka/run-cmake@v10
+        uses: lukka/run-cmake@2ce8982be71b8e9a3c4d5e432135035afd1e76a7
         with:
           configurePreset: code-analysis
           buildPreset: code-analysis
@@ -23,7 +23,7 @@ jobs:
           cd -
 
       - name: Run Codacy Analysis CLI
-        uses: codacy/codacy-analysis-cli-action@master
+        uses: codacy/codacy-analysis-cli-action@97bf5df3c09e75f5bcd72695998f96ebd701846e
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
           clang-tidy-output: "build/clang-tidy-output.txt"
@@ -43,7 +43,7 @@ jobs:
           cd -
 
       - name: Run codacy-coverage-reporter
-        uses: codacy/codacy-coverage-reporter-action@v1.3.0
+        uses: codacy/codacy-coverage-reporter-action@89d6c85cfafaec52c72b6c5e8b2878d33104c699
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
           coverage-reports: ./build/code-analysis/filtered_coverage.info
