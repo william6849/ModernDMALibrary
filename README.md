@@ -1,8 +1,8 @@
  > This is ***work in progress***, so please don’t use it until the first release.  
 
-[![CMake build](https://github.com/william6849/MordenDMALibrary/actions/workflows/cmake.yml/badge.svg?branch=main)](https://github.com/william6849/MordenDMALibrary/actions/workflows/cmake.yml)   [![Codacy](https://app.codacy.com/project/badge/Grade/f1e64783d87e4404b248f8cf20b6073a)](https://app.codacy.com/gh/william6849/MordenDMALibrary/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![CMake build](https://github.com/william6849/ModernDMALibrary/actions/workflows/cmake.yml/badge.svg?branch=main)](https://github.com/william6849/ModernDMALibrary/actions/workflows/cmake.yml)   [![Grade](https://app.codacy.com/project/badge/Grade/f1e64783d87e4404b248f8cf20b6073a)](https://app.codacy.com/gh/william6849/ModernDMALibrary/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)   [![Coverage](https://app.codacy.com/project/badge/Coverage/f1e64783d87e4404b248f8cf20b6073a)](https://app.codacy.com/gh/william6849/ModernDMALibrary/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
 
-# MordenDMALibrary
+# ModernDMALibrary
 I have a MacBook and a PC running Linux, but I don’t want to reboot my secondary PC whenever I want to use DMA.  
 In fact, I don’t want to install multiple operating systems or even get another PC.  
 A flexible DMA library is exactly what I need.
