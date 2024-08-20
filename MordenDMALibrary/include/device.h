@@ -3,19 +3,26 @@
 
 #include <string>
 
-#include "memory.h"
+#include "leechwrapper.h"
+
 class Device {
  public:
-  static Device& GetInstance();
-  Device(const Device&) = delete;
-  void operator=(const Device&) = delete;
-  // virtual ~Device();
+  Device(std::string path);
 
-  static bool InitDevice(std::string device_path);
+  Device(const Device&) = delete;
+  Device& operator=(const Device&) = delete;
+
+  Device(Device&& other) noexcept : vmm_handle_(std::move(other.vmm_handle_)) {}
+
+  Device& operator=(Device&& other) noexcept {
+    if (this != &other) {
+      vmm_handle_ = std::move(other.vmm_handle_);
+    }
+    return *this;
+  }
 
  private:
-  Device();
-  MemoryControl memctl;
+  UniqueVMMHandle vmm_handle_;
 };
 
 #endif

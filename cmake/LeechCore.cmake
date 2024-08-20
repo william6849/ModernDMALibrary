@@ -4,18 +4,18 @@ set_directory_properties(PROPERTIES EP_BASE ${CMAKE_BINARY_DIR}/third_party)
 
 if(WIN32)
   set(RELEASE_URL
-      https://github.com/ufrisk/LeechCore/releases/download/v2.18/LeechCore_files_and_binaries_v2.18.8-win_x64-20240813.zip
+      https://github.com/ufrisk/LeechCore/releases/download/v2.18/LeechCore_files_and_binaries_v2.18.8-win_x64-20240817.zip
   )
 else()
   if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
     set(RELEASE_URL
-        https://github.com/ufrisk/LeechCore/releases/download/v2.18/LeechCore_files_and_binaries_v2.18.8-linux_aarch64-20240813.tar.gz
+        https://github.com/ufrisk/LeechCore/releases/download/v2.18/LeechCore_files_and_binaries_v2.18.8-linux_aarch64-20240817.tar.gz
     )
   elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "i386")
     message(WARNING "x32 platform is not support currently.")
   elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
     set(RELEASE_URL
-        https://github.com/ufrisk/LeechCore/releases/download/v2.18/LeechCore_files_and_binaries_v2.18.8-linux_x64-20240813.tar.gz
+        https://github.com/ufrisk/LeechCore/releases/download/v2.18/LeechCore_files_and_binaries_v2.18.8-linux_x64-20240817.tar.gz
     )
   endif()
 endif()

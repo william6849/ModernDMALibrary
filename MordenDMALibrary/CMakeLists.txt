@@ -42,7 +42,7 @@ add_dependencies(${TARGET_LIBRARY_NAME} spdlog)
 
 if(RUN_CLANG_TIDY_ON_TARGET)
   set_target_properties(
-    ${TARGET_LIBRARY_NAME} PROPERTIES CXX_CLANG_TIDY "clang-tidy;-checks=*"
+    ${TARGET_LIBRARY_NAME} PROPERTIES CXX_CLANG_TIDY "clang-tidy"
                                       EXPORT_COMPILE_COMMANDS "ON")
 endif()
 
