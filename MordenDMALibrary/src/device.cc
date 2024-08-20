@@ -1,18 +1,20 @@
 #include "device.h"
 
-#include "spdlog/spdlog.h"
-#include "vmmdll.h"
+#include <stdexcept>
 
-Device& Device::GetInstance() {
-  static Device instance;
-  return instance;
-}
-
-Device::Device() {}
-
-bool Device::InitDevice(std::string process_path) {
-  LPCSTR* ss;
-  std::vector<std::string> command = {process_path, "-device", "fpga://algo=0"};
-  static auto vmm_handle = VMMDLL_Initialize(command.size(), ss);
-  return false;
-}
+Device::Device(std::string path) : vmm_handle_(nullptr) {
+  if (path.find("-fpga") || path.find("")) {
+    LPCSTR args[] = {(LPCSTR) "", (LPCSTR) "-device", (LPCSTR) "fpga",
+                     (LPCSTR) "-memmap", (LPCSTR) "/home/zznzm/repos/MordenDMALibrary/build/unixlike-gcc-release/"
+      "third_party/Source/MemProcFS/dump.txt"};
+    auto hVMM = VMMDLL_Initialize(5, args);
+    if (hVMM) {
+      vmm_handle_.reset(hVMM);
+    } else {
+      throw std::runtime_error(
+          "VMM operation failed(memo to make custom VMM exceptions)");
+    }
+  } else {
+    throw std::invalid_argument("received invalid value");
+  }
+};
