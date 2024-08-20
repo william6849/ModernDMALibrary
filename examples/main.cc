@@ -1,6 +1,3 @@
-#include "device.h"
+#include "devicehandler.h"
 
-int main(void) {
-  auto& dev = Device::GetInstance();
-  return 0;
-}
+int main(void) { return 0; }
