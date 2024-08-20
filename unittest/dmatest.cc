@@ -1,4 +1,4 @@
-#include "device.h"
+#include "devicehandler.h"
 #include "gtest/gtest.h"
 
-TEST(DMATest, device_init) { ; }
+TEST(DMATest, device_init) {}
