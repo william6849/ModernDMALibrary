@@ -25,6 +25,7 @@ Device::operator VMM_HANDLE() const { return vmm_handle_.get(); }
 const VMM_HANDLE Device::vmm_handle() const { return vmm_handle_.get(); }
 
 void Device::InitVMM(const std::string& params) {
+  spdlog::debug("Initializing VMM with parameters: {}", params);
   std::stringstream ss(params);
 
   std::vector<std::string> parsed;
@@ -41,7 +42,7 @@ void Device::InitVMM(const std::string& params) {
   }
 
   auto hVMM = VMMDLL_Initialize(c_str_vec.size(), c_str_vec.data());
-
+  spdlog::debug("VMMDLL_Initialize return: {}", static_cast<void*>(hVMM));
   if (hVMM) {
     vmm_handle_.reset(hVMM);
   } else {
