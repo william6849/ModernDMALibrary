@@ -8,15 +8,21 @@ DeviceManager& DeviceManager::GetInstance() {
   return inst;
 }
 
+const Device& DeviceManager::GetDevice(int32_t num) {
+  return DeviceManager::GetInstance().device_list().at(num);
+}
+
 DeviceManager::DeviceManager() : device_list_() {}
 
-bool DeviceManager::AddDevice(std::string process_path) {
+int32_t DeviceManager::OpenDevice(std::string params) {
   try {
-    Device dev(process_path);
+    Device dev(params);
     device_list_.push_back(std::move(dev));
-    return true;
-  } catch (const std::invalid_argument& e) {
-    return false;
+    spdlog::info("Device opened.");
+    return device_list_.size() - 1;
+  } catch (const std::runtime_error& e) {
+    spdlog::error("{}", e.what());
+    return -1;
   }
 }
 

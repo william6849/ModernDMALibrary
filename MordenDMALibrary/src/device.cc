@@ -20,6 +20,10 @@ Device& Device::operator=(Device&& other) noexcept {
   return *this;
 }
 
+Device::operator VMM_HANDLE() const { return vmm_handle_.get(); }
+
+const VMM_HANDLE Device::vmm_handle() const { return vmm_handle_.get(); }
+
 void Device::InitVMM(const std::string& params) {
   std::stringstream ss(params);
 
@@ -44,4 +48,25 @@ void Device::InitVMM(const std::string& params) {
     throw std::runtime_error(
         "VMM operation failed(memo to make custom VMM exceptions)");
   }
+}
+
+std::vector<uint8_t> Device::Read(uint64_t addr, size_t bytes) const {
+  std::vector<uint8_t> ret(bytes);
+  auto result = VMMDLL_MemRead(vmm_handle(), -1, addr, ret.data(), bytes);
+  if (result == 0) {
+    throw std::runtime_error("MemRead error");
+    return std::vector<uint8_t>();
+  }
+  spdlog::debug("Device::Read at {:x}: {}", addr, spdlog::to_hex(ret));
+  return ret;
+}
+
+bool Device::Write(uint64_t addr, std::vector<uint8_t> data) const {
+  auto result =
+      VMMDLL_MemWrite(vmm_handle(), -1, addr, data.data(), data.size());
+  if (result == false) {
+    throw std::runtime_error("MemWrite error");
+  }
+  spdlog::debug("Device::Write at {:x}: {}", addr, spdlog::to_hex(data));
+  return result;
 }

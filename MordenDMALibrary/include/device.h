@@ -1,9 +1,11 @@
 #ifndef DEVICE_H
 #define DEVICE_H
 
+#include <cstdint>
 #include <string>
+#include <vector>
 
-#include "leechwrapper.h"
+#include "leech_wrapper.h"
 
 class Device {
  public:
@@ -15,6 +17,12 @@ class Device {
   Device(Device&& other) noexcept;
 
   Device& operator=(Device&& other) noexcept;
+
+  operator VMM_HANDLE() const;
+  const VMM_HANDLE vmm_handle() const;
+
+  std::vector<uint8_t> Read(uint64_t addr, size_t bytes) const;
+  bool Write(uint64_t addr, std::vector<uint8_t> data) const;
 
  protected:
   void InitVMM(const std::string& params);
