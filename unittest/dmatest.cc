@@ -1,10 +1,14 @@
-#include "devicehandler.h"
+#include "device_manager.h"
 #include "gtest/gtest.h"
 
 TEST(DMATest, device_init) {
-  auto& dev = DeviceHandler::GetInstance();
+  auto& dev = DeviceManager::GetInstance();
   // This should be false cuz we don't have mock on VMM IO nor stable DMA
   // envirement(still can be test on your target).
-  EXPECT_FALSE(dev.AddDevice("-device fpga"));
+  auto params =
+      "-device fpga -memmap "
+      "/home/zznzm/repos/MordenDMALibrary/build/unixlike-gcc-release/"
+      "third_party/Source/MemProcFS/dump.txt";
+  dev.AddDevice(params);
   auto& dev_list = dev.device_list();
 }

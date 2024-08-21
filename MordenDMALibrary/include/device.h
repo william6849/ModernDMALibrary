@@ -7,19 +7,17 @@
 
 class Device {
  public:
-  Device(std::string path);
+  Device(const std::string& params);
 
   Device(const Device&) = delete;
   Device& operator=(const Device&) = delete;
 
-  Device(Device&& other) noexcept : vmm_handle_(std::move(other.vmm_handle_)) {}
+  Device(Device&& other) noexcept;
 
-  Device& operator=(Device&& other) noexcept {
-    if (this != &other) {
-      vmm_handle_ = std::move(other.vmm_handle_);
-    }
-    return *this;
-  }
+  Device& operator=(Device&& other) noexcept;
+
+ protected:
+  void InitVMM(const std::string& params);
 
  private:
   UniqueVMMHandle vmm_handle_;
