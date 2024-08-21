@@ -2,7 +2,9 @@
 
 #include <sstream>
 #include <stdexcept>
-#include <vector>
+
+#include "spdlog/fmt/bin_to_hex.h"
+#include "spdlog/spdlog.h"
 
 Device::Device(const std::string& params) : vmm_handle_(nullptr) {
   InitVMM(params);

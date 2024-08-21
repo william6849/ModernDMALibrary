@@ -7,7 +7,9 @@ else()
 endif()
 
 target_include_directories(
-  MDMAB SYSTEM PRIVATE ${CMAKE_BINARY_DIR}/third_party/Source/LeechCore
-                       ${CMAKE_BINARY_DIR}/third_party/Source/MemProcFS)
+  MDMAB SYSTEM
+  PRIVATE ${CMAKE_SOURCE_DIR}/submodules/spdlog/include
+          ${CMAKE_BINARY_DIR}/third_party/Source/LeechCore
+          ${CMAKE_BINARY_DIR}/third_party/Source/MemProcFS)
 
 target_link_libraries(MDMAB MDMAL)

@@ -1,5 +1,6 @@
 #include "device_manager.h"
 #include "gtest/gtest.h"
+#include "spdlog/spdlog.h"
 
 TEST(DMATest, device_init) {
   auto& dev = DeviceManager::GetInstance();
