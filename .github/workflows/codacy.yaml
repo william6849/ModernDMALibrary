@@ -39,7 +39,7 @@ jobs:
         run: |
           cd ./build/code-analysis
           lcov --capture --directory . --output-file coverage.info
-          lcov --ignore-errors unused --remove coverage.info '/usr/include/*' 'submodules' 'googletest' -o filtered_coverage.info
+          lcov --ignore-errors unused --remove coverage.info '/usr/include/*' 'submodules' 'googletest' ".yaml" ".json" -o filtered_coverage.info
           cd -
 
       - name: Run codacy-coverage-reporter
