@@ -21,6 +21,7 @@ class DMAIO {
  private:
   void Init(const std::string& params);
   UniqueVMMHandle vmm_handle_;
+  UniqueLCHandle lc_handle_;
 };
 
 #endif

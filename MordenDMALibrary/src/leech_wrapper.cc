@@ -26,3 +26,10 @@ VMMHandleWrapper& VMMHandleWrapper::operator=(
 VMM_HANDLE VMMHandleWrapper::get() const { return handle_.get(); }
 
 VMMHandleWrapper::operator VMM_HANDLE() const { return handle_.get(); }
+
+void LCHandleDeleter::operator()(HANDLE handle) const {
+  if (handle) {
+    spdlog::debug("Closing LC handler: {}", static_cast<void*>(handle));
+    LcClose(handle);
+  }
+}

@@ -28,4 +28,10 @@ class VMMHandleWrapper {
   UniqueVMMHandle handle_;
 };
 
+struct LCHandleDeleter {
+  void operator()(HANDLE handle) const;
+};
+
+using UniqueLCHandle = std::unique_ptr<void, LCHandleDeleter>;
+
 #endif

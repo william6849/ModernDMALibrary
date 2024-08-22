@@ -53,12 +53,15 @@ void DMAIO::Init(const std::string& params) {
   vmm_handle_.reset(nullptr);
   auto hVMM = VMMDLL_Initialize(c_str_vec.size(), c_str_vec.data());
   spdlog::debug("VMMDLL_Initialize return: {}", static_cast<void*>(hVMM));
-  if (hVMM) {
-    vmm_handle_.reset(hVMM);
-  } else {
+  if (hVMM == nullptr) {
     throw std::runtime_error(
         "VMM operation failed(memo to make custom VMM exceptions)");
   }
+  vmm_handle_.reset(hVMM);
+  LC_CONFIG lc_config = {.dwVersion = LC_CONFIG_VERSION,
+                         .szDevice = "existing"};
+  auto hLC = LcCreate(&lc_config);
+  lc_handle_.reset(hLC);
 }
 
 std::vector<uint8_t> DMAIO::Read(uint64_t addr, size_t bytes) const {
