@@ -23,7 +23,7 @@ int32_t DeviceManager::OpenDevice(const std::string& params) {
     return device_list_.size() - 1;
   } catch (const std::runtime_error& e) {
     spdlog::error("{}", e.what());
-    return -1;
+    throw e;
   }
 }
 

@@ -11,7 +11,7 @@ TEST(DMATest, device_init) {
       "-device fpga -memmap "
       "/home/zznzm/repos/MordenDMALibrary/dump.txt";
 
-  if (ret < 0) return;
+  auto ret = devm.OpenDevice(params);
   auto& dev = DeviceManager::GetDevice(ret);
   auto ret_data = dev.Read(0x1000, 16);
   auto last_ret_data = ret_data;
