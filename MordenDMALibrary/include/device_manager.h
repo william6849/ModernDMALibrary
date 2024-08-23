@@ -10,16 +10,16 @@
 class DeviceManager {
  public:
   static DeviceManager& GetInstance();
-  static const Device& GetDevice(int32_t num);
-  DeviceManager(const DeviceManager&) = delete;
-  void operator=(const DeviceManager&) = delete;
-  // virtual ~DeviceManager();
+  Device& GetDevice(int32_t num);
 
   int32_t OpenDevice(const std::string& params);
   const std::vector<Device>& device_list() const;
 
  private:
   DeviceManager();
+  DeviceManager(const DeviceManager&) = delete;
+  void operator=(const DeviceManager&) = delete;
+
   std::vector<Device> device_list_;
 };
 

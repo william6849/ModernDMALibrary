@@ -9,9 +9,7 @@ DeviceManager& DeviceManager::GetInstance() {
   return inst;
 }
 
-const Device& DeviceManager::GetDevice(int32_t num) {
-  return DeviceManager::GetInstance().device_list().at(num);
-}
+Device& DeviceManager::GetDevice(int32_t num) { return device_list_.at(num); }
 
 DeviceManager::DeviceManager() : device_list_() {}
 
