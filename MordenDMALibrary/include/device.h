@@ -5,7 +5,8 @@
 #include <string>
 #include <vector>
 
-#include "io.h"
+#include "dmaio.h"
+
 class Device {
  public:
   explicit Device(const std::string& params);

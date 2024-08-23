@@ -1,8 +1,8 @@
-#include "io.h"
+#include "dmaio.h"
 
-#include <iostream>
+#include <chrono>
+#include <future>
 #include <sstream>
-#include <stdexcept>
 #include <vector>
 
 #include "spdlog/fmt/bin_to_hex.h"
@@ -11,8 +11,6 @@
 template <typename Func, typename... Args>
 static auto AsyncWithTimeout(Func&& func, std::chrono::milliseconds timeout,
                              Args&&... args) {
-  using ReturnType = decltype(func(std::forward<Args>(args)...));
-
   auto future = std::async(std::launch::async, std::forward<Func>(func),
                            std::forward<Args>(args)...);
 
@@ -53,22 +51,28 @@ void DMAIO::Init(const std::string& params) {
   vmm_handle_.reset(nullptr);
   auto hVMM = VMMDLL_Initialize(c_str_vec.size(), c_str_vec.data());
   spdlog::debug("VMMDLL_Initialize return: {}", static_cast<void*>(hVMM));
-  if (hVMM == nullptr) {
+  if (hVMM) {
+    vmm_handle_.reset(hVMM);
+  } else {
     throw std::runtime_error(
-        "VMM operation failed(memo to make custom VMM exceptions)");
+        "VMMDLL_Initialize failed(memo to make custom VMM exceptions)");
   }
   vmm_handle_.reset(hVMM);
   LC_CONFIG lc_config = {.dwVersion = LC_CONFIG_VERSION,
                          .szDevice = "existing"};
   auto hLC = LcCreate(&lc_config);
-  lc_handle_.reset(hLC);
+  if (hLC) {
+    lc_handle_.reset(hLC);
+  } else {
+    throw std::runtime_error("LcCreate failed.");
+  }
 }
 
 std::vector<uint8_t> DMAIO::Read(uint64_t addr, size_t bytes) const {
   std::vector<uint8_t> ret(bytes);
-  auto result =
-      AsyncWithTimeout(VMMDLL_MemRead, std::chrono::milliseconds(5000),
-                       vmm_handle(), -1, addr, ret.data(), bytes);
+  auto result = AsyncWithTimeout(
+      VMMDLL_MemRead, std::chrono::milliseconds(5000), vmm_handle(),
+      static_cast<DWORD>(-1), addr, ret.data(), static_cast<DWORD>(bytes));
   if (result == 0) {
     throw std::runtime_error("MemRead error");
   }
@@ -79,7 +83,8 @@ std::vector<uint8_t> DMAIO::Read(uint64_t addr, size_t bytes) const {
 bool DMAIO::Write(uint64_t addr, std::vector<uint8_t> data) const {
   auto result =
       AsyncWithTimeout(VMMDLL_MemWrite, std::chrono::milliseconds(5000),
-                       vmm_handle(), -1, addr, data.data(), data.size());
+                       vmm_handle(), static_cast<DWORD>(-1), addr, data.data(),
+                       static_cast<DWORD>(data.size()));
   if (result == false) {
     throw std::runtime_error("MemWrite error");
   }

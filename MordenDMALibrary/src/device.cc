@@ -1,10 +1,5 @@
 #include "device.h"
 
-#include <stdexcept>
-
-#include "spdlog/fmt/bin_to_hex.h"
-#include "spdlog/spdlog.h"
-
 Device::Device(const std::string& params) : io_(params) {};
 
 Device::Device(Device&& other) noexcept : io_(std::move(other.io_)) {}

@@ -15,7 +15,7 @@ class DeviceManager {
   void operator=(const DeviceManager&) = delete;
   // virtual ~DeviceManager();
 
-  int32_t OpenDevice(std::string params);
+  int32_t OpenDevice(const std::string& params);
   const std::vector<Device>& device_list() const;
 
  private:

@@ -1,6 +1,7 @@
 #include "device_manager.h"
 
-#include "device.h"
+#include <stdexcept>
+
 #include "spdlog/spdlog.h"
 
 DeviceManager& DeviceManager::GetInstance() {
@@ -14,7 +15,7 @@ const Device& DeviceManager::GetDevice(int32_t num) {
 
 DeviceManager::DeviceManager() : device_list_() {}
 
-int32_t DeviceManager::OpenDevice(std::string params) {
+int32_t DeviceManager::OpenDevice(const std::string& params) {
   try {
     Device dev(params);
     device_list_.push_back(std::move(dev));

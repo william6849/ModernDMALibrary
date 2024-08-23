@@ -1,8 +1,9 @@
 #ifndef IO_H
 #define IO_H
 
-#include <chrono>
-#include <future>
+#include <cstdint>
+#include <string>
+#include <vector>
 
 #include "leech_wrapper.h"
 
