@@ -13,6 +13,9 @@ TEST(DMATest, device_init) {
 
   auto ret = devm.OpenDevice(params);
   auto& dev = devm.GetDevice(ret);
+
+  dev.options.CORE_VERBOSE = 1;
+
   auto ret_data = dev.Read(0x1000, 0x200);
 
   auto last_ret_data = ret_data;
@@ -21,4 +24,6 @@ TEST(DMATest, device_init) {
 
   ret_data = dev.Read(0x1000, 0x250);
   dev.Write(0x1000, last_ret_data);
+
+  spdlog::debug("opt2: {}", (uint64_t)dev.options.CORE_VERBOSE);
 }
