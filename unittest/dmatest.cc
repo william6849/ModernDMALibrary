@@ -12,12 +12,13 @@ TEST(DMATest, device_init) {
       "/home/zznzm/repos/MordenDMALibrary/dump.txt";
 
   auto ret = devm.OpenDevice(params);
-  auto& dev = DeviceManager::GetDevice(ret);
-  auto ret_data = dev.Read(0x1000, 16);
+  auto& dev = devm.GetDevice(ret);
+  auto ret_data = dev.Read(0x1000, 0x200);
+
   auto last_ret_data = ret_data;
   std::vector<uint8_t> writebytes = {0x11, 0x22, 0x33};
   dev.Write(0x1000, writebytes);
 
-  ret_data = dev.Read(0x1000, 16);
+  ret_data = dev.Read(0x1000, 0x250);
   dev.Write(0x1000, last_ret_data);
 }

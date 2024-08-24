@@ -9,7 +9,7 @@
 #include "spdlog/fmt/bin_to_hex.h"
 #include "spdlog/spdlog.h"
 
-DMAIO::DMAIO() {};
+static VMM_HANDLE hVMM_ = nullptr;
 
 DMAIO::DMAIO(const std::string& params) : vmm_handle_(nullptr) {
   this->Init(params);
@@ -52,6 +52,7 @@ void DMAIO::Init(const std::string& params) {
     spdlog::error("VMMDLL_Initialize Failed.");
     exit(0);
   }
+  hVMM_ = vmm_handle;
   vmm_handle_.reset(vmm_handle);
 
   spdlog::debug("VMMDLL_Initialize return: {}", static_cast<void*>(vmm_handle));
@@ -63,6 +64,9 @@ void DMAIO::Init(const std::string& params) {
   if (!leechcore_handler) {
     throw std::runtime_error("LcCreate failed.");
   }
+  BYTE cmd[4] = {0x10, 0x00, 0x10, 0x00};
+  LcCommand(leechcore_handler, LC_CMD_FPGA_CFGREGPCIE_MARKWR | 0x002, 4, cmd,
+            NULL, NULL);
   lc_handle_.reset(leechcore_handler);
   spdlog::info("Device IO initialized");
 }
