@@ -16,9 +16,9 @@ OptionProxy<S>::OptionProxy(uint64_t opt, bool read, bool write)
     : opt_(opt), read_(read), write_(write){};
 
 template <typename S>
-S OptionProxy<S>::read() {
+S OptionProxy<S>::Read() {
   if (!read_) {
-    spdlog::warn("Invalid read access: {}", __func__);
+    spdlog::error("Invalid read access: {}", __func__);
   }
   if (!VMMDLL_ConfigGet(hVMM_, static_cast<ULONG64>(opt_),
                         reinterpret_cast<PULONG64>(&value_))) {
@@ -28,9 +28,9 @@ S OptionProxy<S>::read() {
 }
 
 template <typename S>
-void OptionProxy<S>::write(const uint64_t& val) {
+void OptionProxy<S>::Write(const uint64_t& val) {
   if (!write_) {
-    spdlog::warn("Invalid write access: {}", __func__);
+    spdlog::error("Invalid write access: {}", __func__);
   }
   if (!VMMDLL_ConfigSet(hVMM_, static_cast<ULONG64>(opt_),
                         static_cast<ULONG64>(val))) {

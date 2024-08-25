@@ -12,16 +12,19 @@ class OptionProxy {
  public:
   explicit OptionProxy(uint64_t opt, bool read, bool write);
   OptionProxy& operator=(const uint64_t& val) {
-    write(val);
+    Write(val);
     return *this;
   };
-  operator S() { return read(); };
+  operator S() { return Read(); };
 
-  virtual S read();
-  virtual void write(const uint64_t& val);
+  virtual S Read();
+  virtual void Write(const uint64_t& val);
 
  private:
-  void operator=(const OptionProxy&) = delete;
+  OptionProxy(const OptionProxy&) = delete;
+  OptionProxy& operator=(const OptionProxy&) = delete;
+  OptionProxy(OptionProxy&&) = delete;
+  OptionProxy& operator=(OptionProxy&&) = delete;
 
   S value_ = 0;
   uint64_t opt_ = 0;
@@ -32,7 +35,7 @@ class OptionProxy {
 namespace Target {
 class Options {
  public:
-  Options();
+  Options() = default;
   OptionProxy<uint64_t> CORE_PRINTF_ENABLE;
   OptionProxy<uint64_t> CORE_VERBOSE;
   OptionProxy<uint64_t> CORE_VERBOSE_EXTRA;
@@ -70,6 +73,12 @@ class Options {
   OptionProxy<uint64_t> REFRESH_FREQ_SLOW;
   OptionProxy<uint64_t> PROCESS_DTB;
   OptionProxy<uint64_t> PROCESS_DTB_FAST_LOWINTEGRITY;
+
+ private:
+  Options(const Options&) = delete;
+  Options& operator=(const Options&) = delete;
+  Options(Options&&) = delete;
+  Options& operator=(Options&&) = delete;
 };
 
 }  // namespace Target
