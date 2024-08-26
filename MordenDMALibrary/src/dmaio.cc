@@ -171,5 +171,4 @@ Options::Options()
       PROCESS_DTB(VMMDLL_OPT_PROCESS_DTB, false, true),
       PROCESS_DTB_FAST_LOWINTEGRITY(VMMDLL_OPT_PROCESS_DTB_FAST_LOWINTEGRITY,
                                     false, true) {}
-
 }  // namespace Target

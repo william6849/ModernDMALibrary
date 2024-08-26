@@ -21,11 +21,6 @@ class OptionProxy {
   virtual void Write(const uint64_t& val);
 
  private:
-  OptionProxy(const OptionProxy&) = delete;
-  OptionProxy& operator=(const OptionProxy&) = delete;
-  OptionProxy(OptionProxy&&) = delete;
-  OptionProxy& operator=(OptionProxy&&) = delete;
-
   S value_ = 0;
   uint64_t opt_ = 0;
   bool read_ = false;
@@ -35,7 +30,7 @@ class OptionProxy {
 namespace Target {
 class Options {
  public:
-  Options() = default;
+  Options();
   OptionProxy<uint64_t> CORE_PRINTF_ENABLE;
   OptionProxy<uint64_t> CORE_VERBOSE;
   OptionProxy<uint64_t> CORE_VERBOSE_EXTRA;
