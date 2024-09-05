@@ -2,6 +2,7 @@
 #define LEECH_WRAPPER_H
 
 #include <memory>
+#include <vector>
 
 #include "vmmdll.h"
 
@@ -33,5 +34,16 @@ struct LCHandleDeleter {
 };
 
 using UniqueLCHandle = std::unique_ptr<void, LCHandleDeleter>;
+namespace LC {};
+namespace VMM {
+
+VMM_HANDLE Initialize(const std::string& arguments);
+std::vector<uint8_t> MemReadEx(const VMM_HANDLE handle, const uint32_t pid,
+                               const uint64_t addr, const size_t bytes,
+                               uint32_t flag);
+bool MemWrite(const VMM_HANDLE handle, const uint32_t pid, const uint64_t addr,
+              std::vector<uint8_t>& data);
+
+};  // namespace VMM
 
 #endif

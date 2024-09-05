@@ -91,8 +91,13 @@ class DMAIO {
   DMAIO(const std::string& params);
   void Reset(const std::string& params);
 
-  std::vector<uint8_t> Read(uint64_t addr, size_t bytes) const;
-  bool Write(uint64_t addr, std::vector<uint8_t> data) const;
+  std::vector<uint8_t> Read(uint64_t physical_addr, size_t bytes) const;
+  bool Write(uint64_t physical_addr, std::vector<uint8_t>& data) const;
+
+  std::vector<uint8_t> Read(uint32_t pid, uint64_t virtual_addr,
+                            size_t bytes) const;
+  bool Write(uint32_t pid, uint64_t virtual_addr,
+             std::vector<uint8_t>& data) const;
 
   operator VMM_HANDLE() const;
   const VMM_HANDLE vmm_handle() const;
