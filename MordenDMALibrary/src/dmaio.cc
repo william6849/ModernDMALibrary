@@ -6,7 +6,6 @@
 #include <stdexcept>
 #include <vector>
 
-#include "spdlog/fmt/bin_to_hex.h"
 #include "spdlog/spdlog.h"
 
 static VMM_HANDLE hVMM_ = nullptr;
@@ -30,13 +29,13 @@ S OptionProxy<S>::Read() {
 template <typename S>
 void OptionProxy<S>::Write(const uint64_t& val) {
   if (!write_) {
-    spdlog::error("Invalid write access: {}", __func__);
+    spdlog::error("Invalid write access");
   }
   if (!VMMDLL_ConfigSet(hVMM_, static_cast<ULONG64>(opt_),
                         static_cast<ULONG64>(val))) {
     spdlog::error("VMMDLL_ConfigSet Failed");
   }
-  value_ = val;
+  value_ = static_cast<S>(val);
 }
 
 DMAIO::DMAIO() {}

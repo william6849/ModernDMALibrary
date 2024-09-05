@@ -20,8 +20,15 @@ class OptionProxy {
   virtual S Read();
   virtual void Write(const uint64_t& val);
 
+  template <typename U = S>
+  typename std::enable_if<std::is_same<U, VMMDLL_MEMORYMODEL_TP>::value,
+                          std::string>::type
+  str() {
+    return std::string(VMMDLL_MEMORYMODEL_TOSTRING[Read()]);
+  }
+
  private:
-  S value_ = 0;
+  S value_ = static_cast<S>(0);
   uint64_t opt_ = 0;
   bool read_ = false;
   bool write_ = false;
@@ -39,7 +46,7 @@ class Options {
   OptionProxy<uint64_t> CORE_LEECHCORE_HANDLE;
   OptionProxy<uint64_t> CORE_VMM_ID;
   OptionProxy<uint64_t> CORE_SYSTEM;
-  OptionProxy<uint64_t> CORE_MEMORYMODEL;
+  OptionProxy<VMMDLL_MEMORYMODEL_TP> CORE_MEMORYMODEL;
   OptionProxy<uint64_t> CONFIG_IS_REFRESH_ENABLED;
   OptionProxy<uint64_t> CONFIG_TICK_PERIOD;
   OptionProxy<uint64_t> CONFIG_READCACHE_TICKS;
