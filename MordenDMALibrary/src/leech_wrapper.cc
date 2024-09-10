@@ -35,6 +35,13 @@ void LCHandleDeleter::operator()(HANDLE handle) const {
   }
 }
 
+void ScatterHandleDeleter::operator()(HANDLE handle) const {
+  if (handle) {
+    spdlog::debug("Closing Scatter handler: {}", static_cast<void*>(handle));
+    VMMDLL_Scatter_CloseHandle(handle);
+  }
+}
+
 VMM_HANDLE VMM::Initialize(const std::string& params) {
   spdlog::debug("Parameters: {}", params);
 
