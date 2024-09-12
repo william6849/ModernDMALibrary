@@ -2,15 +2,6 @@
 
 Device::Device(const std::string& params) : io_(params) {};
 
-Device::Device(Device&& other) noexcept : io_(std::move(other.io_)) {}
-
-Device& Device::operator=(Device&& other) noexcept {
-  if (this != &other) {
-    io_ = std::move(other.io_);
-  }
-  return *this;
-}
-
 std::vector<uint8_t> Device::Read(uint64_t addr, size_t bytes) const {
   return io_.Read(addr, bytes);
 }

@@ -3,41 +3,66 @@
 
 #include <chrono>
 #include <memory>
+#include <mutex>
 #include <vector>
 
 #include "vmmdll.h"
 
-struct VMMHandleDeleter {
-  void operator()(VMM_HANDLE handle) const;
-};
-
-using UniqueVMMHandle = std::unique_ptr<tdVMM_HANDLE, VMMHandleDeleter>;
+void VMMHandleDeleter(VMM_HANDLE handle);
 
 class VMMHandleWrapper {
  public:
-  explicit VMMHandleWrapper(VMM_HANDLE handle);
+  VMMHandleWrapper() {};
+  VMMHandleWrapper(VMM_HANDLE handle);
 
-  VMMHandleWrapper(const VMMHandleWrapper&) = delete;
-  VMMHandleWrapper& operator=(const VMMHandleWrapper&) = delete;
+  VMMHandleWrapper& operator=(
+      const std::shared_ptr<tdVMM_HANDLE>& other) noexcept {
+    handle_ = other;
+    return *this;
+  };
 
-  VMMHandleWrapper(VMMHandleWrapper&& other) noexcept;
-  VMMHandleWrapper& operator=(VMMHandleWrapper&& other) noexcept;
+  template <typename Func, typename... Args>
+  auto Call(Func&& func, Args&&... args) {
+    std::lock_guard<std::mutex> lock(*mutex_);
+    return func(handle_.get(), std::forward<Args>(args)...);
+  }
+
+  void reset(VMM_HANDLE handle) noexcept;
 
   VMM_HANDLE get() const;
   operator VMM_HANDLE() const;
 
  private:
-  UniqueVMMHandle handle_;
+  std::shared_ptr<tdVMM_HANDLE> handle_;
+  std::shared_ptr<std::mutex> mutex_;
 };
 
-struct LCHandleDeleter {
-  void operator()(HANDLE handle) const;
-};
+void HandleDeleter(HANDLE handle);
 
-using UniqueLCHandle = std::unique_ptr<void, LCHandleDeleter>;
+class LCHandleWrapper {
+ public:
+  LCHandleWrapper() {};
+  LCHandleWrapper(HANDLE handle);
 
-struct ScatterHandleDeleter {
-  void operator()(HANDLE handle) const;
+  LCHandleWrapper& operator=(const std::shared_ptr<void>& other) noexcept {
+    handle_ = other;
+    return *this;
+  };
+
+  template <typename Func, typename... Args>
+  auto Call(Func&& func, Args&&... args) {
+    std::lock_guard<std::mutex> lock(*mutex_);
+    return func(handle_.get(), std::forward<Args>(args)...);
+  }
+
+  void reset(HANDLE handle) noexcept;
+
+  HANDLE get() const;
+  operator HANDLE() const;
+
+ private:
+  std::shared_ptr<void> handle_;
+  std::shared_ptr<std::mutex> mutex_;
 };
 
 namespace LC {};

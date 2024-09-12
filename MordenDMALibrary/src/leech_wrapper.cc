@@ -3,44 +3,45 @@
 #include "spdlog/fmt/bin_to_hex.h"
 #include "spdlog/spdlog.h"
 
-void VMMHandleDeleter::operator()(VMM_HANDLE handle) const {
+void VMMHandleDeleter(VMM_HANDLE handle) {
   if (handle) {
     spdlog::debug("Closing VMM handler: {}", static_cast<void*>(handle));
     VMMDLL_Close(handle);
   }
 }
 
-VMMHandleWrapper::VMMHandleWrapper(VMM_HANDLE handle) : handle_(handle) {}
+VMMHandleWrapper::VMMHandleWrapper(VMM_HANDLE handle) {
+  handle_ = std::shared_ptr<tdVMM_HANDLE>(handle, VMMHandleDeleter);
+  mutex_ = std::make_shared<std::mutex>();
+}
 
-VMMHandleWrapper::VMMHandleWrapper(VMMHandleWrapper&& other) noexcept
-    : handle_(std::move(other.handle_)) {}
-
-VMMHandleWrapper& VMMHandleWrapper::operator=(
-    VMMHandleWrapper&& other) noexcept {
-  if (this != &other) {
-    handle_ = std::move(other.handle_);
-    other.handle_ = nullptr;
-  }
-  return *this;
+void VMMHandleWrapper::reset(VMM_HANDLE handle) noexcept {
+  handle_ = std::shared_ptr<tdVMM_HANDLE>(handle, VMMHandleDeleter);
 }
 
 VMM_HANDLE VMMHandleWrapper::get() const { return handle_.get(); }
 
 VMMHandleWrapper::operator VMM_HANDLE() const { return handle_.get(); }
 
-void LCHandleDeleter::operator()(HANDLE handle) const {
+void LCHandleDeleter(HANDLE handle) {
   if (handle) {
-    spdlog::debug("Closing LC handler: {}", static_cast<void*>(handle));
+    spdlog::debug("Closing handler: {}", static_cast<void*>(handle));
     LcClose(handle);
   }
 }
 
-void ScatterHandleDeleter::operator()(HANDLE handle) const {
-  if (handle) {
-    spdlog::debug("Closing Scatter handler: {}", static_cast<void*>(handle));
-    VMMDLL_Scatter_CloseHandle(handle);
-  }
+LCHandleWrapper::LCHandleWrapper(HANDLE handle) {
+  handle_ = std::shared_ptr<void>(handle, LCHandleDeleter);
+  mutex_ = std::make_shared<std::mutex>();
 }
+
+void LCHandleWrapper::reset(HANDLE handle) noexcept {
+  handle_ = std::shared_ptr<void>(handle, LCHandleDeleter);
+}
+
+HANDLE LCHandleWrapper::get() const { return handle_.get(); }
+
+LCHandleWrapper::operator HANDLE() const { return handle_.get(); }
 
 VMM_HANDLE VMM::Initialize(const std::string& params) {
   spdlog::debug("Parameters: {}", params);

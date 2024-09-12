@@ -77,10 +77,6 @@ class Options {
   OptionProxy<uint64_t> PROCESS_DTB_FAST_LOWINTEGRITY;
 
  private:
-  Options(const Options&) = delete;
-  Options& operator=(const Options&) = delete;
-  Options(Options&&) = delete;
-  Options& operator=(Options&&) = delete;
 };
 
 }  // namespace Target
@@ -104,8 +100,8 @@ class DMAIO {
 
  private:
   void Init(const std::string& params);
-  UniqueVMMHandle vmm_handle_;
-  UniqueLCHandle lc_handle_;
+  VMMHandleWrapper vmm_handle_;
+  LCHandleWrapper lc_handle_;
 };
 
 #endif
