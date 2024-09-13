@@ -10,60 +10,28 @@
 
 void VMMHandleDeleter(VMM_HANDLE handle);
 
-class VMMHandleWrapper {
- public:
-  VMMHandleWrapper() {};
-  VMMHandleWrapper(VMM_HANDLE handle);
+void LCHandleDeleter(HANDLE handle);
 
-  VMMHandleWrapper& operator=(
-      const std::shared_ptr<tdVMM_HANDLE>& other) noexcept {
-    handle_ = other;
-    return *this;
-  };
+template <typename T>
+class HandleWrapper {
+ public:
+  HandleWrapper();
+  HandleWrapper(T* handle);
+  HandleWrapper(T* handle, void (*deleter)(T*));
 
   template <typename Func, typename... Args>
-  auto Call(Func&& func, Args&&... args) {
-    std::lock_guard<std::mutex> lock(*mutex_);
-    return func(handle_.get(), std::forward<Args>(args)...);
-  }
+  auto Call(Func&& func, Args&&... args);
 
-  void reset(VMM_HANDLE handle) noexcept;
+  void reset(T* handle, void (*deleter)(T*));
 
-  VMM_HANDLE get() const;
-  operator VMM_HANDLE() const;
+  T* get() const;
+  operator T*() const;
 
  private:
-  std::shared_ptr<tdVMM_HANDLE> handle_;
+  std::shared_ptr<T> handle_;
   std::shared_ptr<std::mutex> mutex_;
 };
-
-void HandleDeleter(HANDLE handle);
-
-class LCHandleWrapper {
- public:
-  LCHandleWrapper() {};
-  LCHandleWrapper(HANDLE handle);
-
-  LCHandleWrapper& operator=(const std::shared_ptr<void>& other) noexcept {
-    handle_ = other;
-    return *this;
-  };
-
-  template <typename Func, typename... Args>
-  auto Call(Func&& func, Args&&... args) {
-    std::lock_guard<std::mutex> lock(*mutex_);
-    return func(handle_.get(), std::forward<Args>(args)...);
-  }
-
-  void reset(HANDLE handle) noexcept;
-
-  HANDLE get() const;
-  operator HANDLE() const;
-
- private:
-  std::shared_ptr<void> handle_;
-  std::shared_ptr<std::mutex> mutex_;
-};
+#include "handle_wrapper.tcc"
 
 namespace LC {};
 namespace VMM {

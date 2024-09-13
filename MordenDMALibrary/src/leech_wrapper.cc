@@ -10,38 +10,12 @@ void VMMHandleDeleter(VMM_HANDLE handle) {
   }
 }
 
-VMMHandleWrapper::VMMHandleWrapper(VMM_HANDLE handle) {
-  handle_ = std::shared_ptr<tdVMM_HANDLE>(handle, VMMHandleDeleter);
-  mutex_ = std::make_shared<std::mutex>();
-}
-
-void VMMHandleWrapper::reset(VMM_HANDLE handle) noexcept {
-  handle_ = std::shared_ptr<tdVMM_HANDLE>(handle, VMMHandleDeleter);
-}
-
-VMM_HANDLE VMMHandleWrapper::get() const { return handle_.get(); }
-
-VMMHandleWrapper::operator VMM_HANDLE() const { return handle_.get(); }
-
 void LCHandleDeleter(HANDLE handle) {
   if (handle) {
     spdlog::debug("Closing handler: {}", static_cast<void*>(handle));
     LcClose(handle);
   }
 }
-
-LCHandleWrapper::LCHandleWrapper(HANDLE handle) {
-  handle_ = std::shared_ptr<void>(handle, LCHandleDeleter);
-  mutex_ = std::make_shared<std::mutex>();
-}
-
-void LCHandleWrapper::reset(HANDLE handle) noexcept {
-  handle_ = std::shared_ptr<void>(handle, LCHandleDeleter);
-}
-
-HANDLE LCHandleWrapper::get() const { return handle_.get(); }
-
-LCHandleWrapper::operator HANDLE() const { return handle_.get(); }
 
 VMM_HANDLE VMM::Initialize(const std::string& params) {
   spdlog::debug("Parameters: {}", params);

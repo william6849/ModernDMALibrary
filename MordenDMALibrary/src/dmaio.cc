@@ -40,9 +40,7 @@ void OptionProxy<S>::Write(const uint64_t& val) {
 
 DMAIO::DMAIO() {}
 
-DMAIO::DMAIO(const std::string& params) : vmm_handle_(nullptr) {
-  this->Init(params);
-}
+DMAIO::DMAIO(const std::string& params) { this->Init(params); }
 
 DMAIO::operator VMM_HANDLE() const { return vmm_handle_.get(); }
 
@@ -68,7 +66,7 @@ void DMAIO::Init(const std::string& params) {
     exit(0);
   }
   hVMM_ = vmm_handle;
-  vmm_handle_.reset(vmm_handle);
+  vmm_handle_.reset(vmm_handle, VMMHandleDeleter);
 
   spdlog::debug("VMMDLL_Initialize return address: {}",
                 static_cast<void*>(vmm_handle));
@@ -84,7 +82,7 @@ void DMAIO::Init(const std::string& params) {
   BYTE cmd[4] = {0x10, 0x00, 0x10, 0x00};
   LcCommand(leechcore_handler, LC_CMD_FPGA_CFGREGPCIE_MARKWR | 0x002, 4, cmd,
             NULL, NULL);
-  lc_handle_.reset(leechcore_handler);
+  lc_handle_.reset(leechcore_handler, LCHandleDeleter);
 
   spdlog::info("Device IO initialized");
 }

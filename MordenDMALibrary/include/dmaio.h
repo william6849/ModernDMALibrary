@@ -100,8 +100,8 @@ class DMAIO {
 
  private:
   void Init(const std::string& params);
-  VMMHandleWrapper vmm_handle_;
-  LCHandleWrapper lc_handle_;
+  HandleWrapper<tdVMM_HANDLE> vmm_handle_;
+  HandleWrapper<void> lc_handle_;
 };
 
 #endif
