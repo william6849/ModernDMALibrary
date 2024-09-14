@@ -42,9 +42,11 @@ DMAIO::DMAIO() {}
 
 DMAIO::DMAIO(const std::string& params) { this->Init(params); }
 
-DMAIO::operator VMM_HANDLE() const { return vmm_handle_.get(); }
+DMAIO::operator VMM_HANDLE() const { return vmm_handle_->get(); }
 
-const VMM_HANDLE DMAIO::vmm_handle() const { return vmm_handle_.get(); }
+const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> DMAIO::vmm_handle() const {
+  return vmm_handle_;
+}
 
 void DMAIO::Reset(const std::string& params) { this->Init(params); }
 
@@ -65,8 +67,9 @@ void DMAIO::Init(const std::string& params) {
     spdlog::error("VMM Initialize Failed.");
     exit(0);
   }
+
   hVMM_ = vmm_handle;
-  vmm_handle_.reset(vmm_handle, VMMHandleDeleter);
+  vmm_handle_->reset(vmm_handle, VMM::HandleDeleter);
 
   spdlog::debug("VMMDLL_Initialize return address: {}",
                 static_cast<void*>(vmm_handle));
@@ -82,27 +85,27 @@ void DMAIO::Init(const std::string& params) {
   BYTE cmd[4] = {0x10, 0x00, 0x10, 0x00};
   LcCommand(leechcore_handler, LC_CMD_FPGA_CFGREGPCIE_MARKWR | 0x002, 4, cmd,
             NULL, NULL);
-  lc_handle_.reset(leechcore_handler, LCHandleDeleter);
+  lc_handle_->reset(leechcore_handler, LC::HandleDeleter);
 
   spdlog::info("Device IO initialized");
 }
 
 std::vector<uint8_t> DMAIO::Read(uint64_t physical_addr, size_t bytes) const {
-  return VMM::MemReadEx(vmm_handle(), -1, physical_addr, bytes, 0);
+  return vmm_handle_->Call(VMM::MemReadEx, -1, physical_addr, bytes, 0);
 }
 
 bool DMAIO::Write(uint64_t physical_addr, std::vector<uint8_t>& data) const {
-  return VMM::MemWrite(vmm_handle(), -1, physical_addr, data);
+  return vmm_handle_->Call(VMM::MemWrite, -1, physical_addr, data);
 }
 
 std::vector<uint8_t> DMAIO::Read(uint32_t pid, uint64_t virtual_addr,
                                  size_t bytes) const {
-  return VMM::MemReadEx(vmm_handle(), pid, virtual_addr, bytes, 0);
+  return vmm_handle_->Call(VMM::MemReadEx, pid, virtual_addr, bytes, 0);
 }
 
 bool DMAIO::Write(uint32_t pid, uint64_t virtual_addr,
                   std::vector<uint8_t>& data) const {
-  return VMM::MemWrite(vmm_handle(), pid, virtual_addr, data);
+  return vmm_handle_->Call(VMM::MemWrite, pid, virtual_addr, data);
 }
 
 namespace Target {

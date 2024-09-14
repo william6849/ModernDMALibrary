@@ -8,14 +8,9 @@
 
 #include "vmmdll.h"
 
-void VMMHandleDeleter(VMM_HANDLE handle);
-
-void LCHandleDeleter(HANDLE handle);
-
 template <typename T>
 class HandleWrapper {
  public:
-  HandleWrapper();
   HandleWrapper(T* handle);
   HandleWrapper(T* handle, void (*deleter)(T*));
 
@@ -23,18 +18,20 @@ class HandleWrapper {
   auto Call(Func&& func, Args&&... args);
 
   void reset(T* handle, void (*deleter)(T*));
-
   T* get() const;
   operator T*() const;
 
  private:
-  std::shared_ptr<T> handle_;
-  std::shared_ptr<std::mutex> mutex_;
+  std::unique_ptr<T, void (*)(T*)> handle_;
+  std::mutex mutex_;
 };
 #include "handle_wrapper.tcc"
 
-namespace LC {};
+namespace LC {
+void HandleDeleter(HANDLE handle);
+};
 namespace VMM {
+void HandleDeleter(VMM_HANDLE handle);
 
 VMM_HANDLE Initialize(const std::string& arguments);
 std::vector<uint8_t> MemReadEx(const VMM_HANDLE handle, const uint32_t pid,

@@ -80,7 +80,6 @@ class Options {
 };
 
 }  // namespace Target
-
 class DMAIO {
  public:
   DMAIO();
@@ -96,12 +95,12 @@ class DMAIO {
              std::vector<uint8_t>& data) const;
 
   operator VMM_HANDLE() const;
-  const VMM_HANDLE vmm_handle() const;
+  const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> vmm_handle() const;
 
  private:
   void Init(const std::string& params);
-  HandleWrapper<tdVMM_HANDLE> vmm_handle_;
-  HandleWrapper<void> lc_handle_;
+  std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> vmm_handle_;
+  std::shared_ptr<HandleWrapper<void>> lc_handle_;
 };
 
 #endif
