@@ -2,8 +2,10 @@
 #define LEECH_WRAPPER_H
 
 #include <chrono>
+#include <map>
 #include <memory>
 #include <mutex>
+#include <unordered_map>
 #include <vector>
 
 #include "vmmdll.h"
@@ -41,37 +43,45 @@ bool MemWrite(const VMM_HANDLE handle, const uint32_t pid, const uint64_t addr,
               std::vector<uint8_t>& data);
 
 struct ScatterRequestPackage {
-  uint64_t address = 0;
-  uint64_t length = 0;
+  DWORD version = MEM_SCATTER_VERSION;
+  bool f = false;
+  int64_t address;
+  uint8_t* pb = buffer.data();
+  int64_t _filler;
+  int32_t length = 4096;
+  int32_t iStack;
+  int64_t vStack[MEM_SCATTER_STACK_SIZE];
+
+  std::vector<uint8_t> buffer;
 };
 typedef ScatterRequestPackage SRP;
 
 class Scatter {
  public:
-  Scatter();
+  Scatter(const HandleWrapper<VMM_HANDLE>& handle_wrapper);
   Scatter(uint32_t pid, uint32_t flags);
-  ~Scatter();
 
-  bool AddSRP(SRP srp);
+  bool AddSRP(const SRP& srp);
   bool AddSRP(const std::vector<SRP>& srps);
-  bool RemoveSRP(SRP srp);
-  const std::vector<SRP>& SRPList() noexcept;
+  bool AddSRP(int64_t address, int32_t length);
+  bool RemoveSRP(const SRP& srp);
+  bool RemoveSRP(int64_t address);
+  SRP* GetSRP(int64_t address);
+  std::vector<uint8_t>& GetData(int64_t address);
+
+  const std::map<int64_t, SRP>& SRPMap() noexcept;
 
   bool ExecuteRead();
-  const std::vector<uint8_t>& Read(uint64_t address);
-  const std::vector<uint8_t>& Read(uint64_t address, uint64_t length);
   bool ExecuteWrite();
-  bool Write(uint64_t address, const std::vector<uint8_t>& data);
 
   void SetPID(uint32_t pid);
   void SetFlags(uint32_t flags);
 
  private:
-  std::unordered_map<uint64_t, SRP> srp_list_;
-  std::map<SRP, std::vector<uint8_t>> sr_buffer;
+  std::map<int64_t, SRP> srp_map_;
   uint32_t pid_;
   uint32_t flags_;
-  std::chrono::system_clock::time_point last_execute_;
+  std::chrono::system_clock::time_point last_execution_;
 };
 };  // namespace VMM
 
