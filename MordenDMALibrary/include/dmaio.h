@@ -10,7 +10,9 @@
 template <typename S>
 class OptionProxy {
  public:
-  explicit OptionProxy(uint64_t opt, bool read, bool write);
+  explicit OptionProxy(
+      const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>>& handle, uint64_t opt,
+      bool read, bool write);
   OptionProxy& operator=(const uint64_t& val) {
     Write(val);
     return *this;
@@ -32,12 +34,13 @@ class OptionProxy {
   uint64_t opt_ = 0;
   bool read_ = false;
   bool write_ = false;
+  std::weak_ptr<HandleWrapper<tdVMM_HANDLE>> io_;
 };
 
 namespace Target {
 class Options {
  public:
-  Options();
+  Options(const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>>& handle);
   OptionProxy<uint64_t> CORE_PRINTF_ENABLE;
   OptionProxy<uint64_t> CORE_VERBOSE;
   OptionProxy<uint64_t> CORE_VERBOSE_EXTRA;
