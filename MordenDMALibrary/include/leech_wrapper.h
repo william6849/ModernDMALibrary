@@ -13,8 +13,9 @@
 template <typename T>
 class HandleWrapper {
  public:
-  HandleWrapper(T* handle);
-  HandleWrapper(T* handle, void (*deleter)(T*));
+  HandleWrapper(std::shared_ptr<std::mutex>& mutex, T* handle);
+  HandleWrapper(std::shared_ptr<std::mutex>& mutex, T* handle,
+                void (*deleter)(T*));
 
   template <typename Func, typename... Args>
   auto Call(Func&& func, Args&&... args);
@@ -25,7 +26,7 @@ class HandleWrapper {
 
  private:
   std::unique_ptr<T, void (*)(T*)> handle_;
-  std::mutex mutex_;
+  std::weak_ptr<std::mutex> mutex_;
 };
 #include "handle_wrapper.tcc"
 

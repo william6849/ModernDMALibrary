@@ -1,17 +1,24 @@
 template <typename T>
-HandleWrapper<T>::HandleWrapper(T* handle) {
+HandleWrapper<T>::HandleWrapper(std::shared_ptr<std::mutex>& mutex, T* handle) {
+  mutex_ = mutex;
   handle_ = std::unique_ptr<T>(handle);
 }
 
 template <typename T>
-HandleWrapper<T>::HandleWrapper(T* handle, void (*deleter)(T*)) {
+HandleWrapper<T>::HandleWrapper(std::shared_ptr<std::mutex>& mutex, T* handle,
+                                void (*deleter)(T*)) {
+  mutex_ = mutex;
   handle_ = std::unique_ptr<T, void (*)(T*)>(handle, deleter);
 }
 
 template <typename T>
 template <typename Func, typename... Args>
 auto HandleWrapper<T>::Call(Func&& func, Args&&... args) {
-  std::lock_guard<std::mutex> lock(mutex_);
+  auto mutex = mutex_.lock();
+  if (!mutex) {
+    throw std::runtime_error("Null mutex");
+  }
+  std::lock_guard<std::mutex> lock(*mutex);
   return func(handle_.get(), std::forward<Args>(args)...);
 }
 

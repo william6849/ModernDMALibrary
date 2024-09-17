@@ -104,6 +104,7 @@ class DMAIO {
   void Init(const std::string& params);
   std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> vmm_handle_;
   std::shared_ptr<HandleWrapper<void>> lc_handle_;
+  std::shared_ptr<std::mutex> mutex_;
 };
 
 #endif

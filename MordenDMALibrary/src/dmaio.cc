@@ -38,9 +38,12 @@ void OptionProxy<S>::Write(const uint64_t& val) {
   value_ = static_cast<S>(val);
 }
 
-DMAIO::DMAIO() {}
+DMAIO::DMAIO() : vmm_handle_(mutex_, NULL), lc_handle_(mutex_, NULL) {}
 
-DMAIO::DMAIO(const std::string& params) { this->Init(params); }
+DMAIO::DMAIO(const std::string& params)
+    : vmm_handle_(mutex_, NULL), lc_handle_(mutex_, NULL) {
+  this->Init(params);
+}
 
 DMAIO::operator VMM_HANDLE() const { return vmm_handle_->get(); }
 
