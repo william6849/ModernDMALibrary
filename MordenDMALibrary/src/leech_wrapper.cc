@@ -63,4 +63,91 @@ bool MemWrite(const VMM_HANDLE handle, const uint32_t pid, const uint64_t addr,
   spdlog::debug("VMM::Write at {:x}: {}", addr, spdlog::to_hex(data));
   return result;
 }
+
+int32_t MemReadScatter(const VMM_HANDLE handle, const int32_t pid,
+                       PPMEM_SCATTER ppmems, int32_t cpmems, int32_t flags) {
+  return VMMDLL_MemReadScatter(handle, pid, ppmems, cpmems, flags);
+}
+
+int32_t MemWriteScatter(const VMM_HANDLE handle, int32_t pid,
+                        PPMEM_SCATTER ppmems, int32_t cpmems) {
+  return VMMDLL_MemWriteScatter(handle, pid, ppmems, cpmems);
+}
+
+Scatter::Scatter(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>>& handle_wrapper,
+    uint32_t pid = -1,
+    uint32_t flags = VMMDLL_FLAG_NOCACHE | VMMDLL_FLAG_ZEROPAD_ON_FAIL |
+                     VMMDLL_FLAG_NOPAGING)
+    : pid_(pid), flags_(flags) {
+  handle_ = handle_wrapper;
+}
+
+void Scatter::AddSRP(const SRP& srp) { srp_map_[srp.address] = srp; }
+
+void Scatter::AddSRP(const std::vector<SRP>& srps) {
+  for (auto& srp : srps) {
+    AddSRP(srp);
+  }
+}
+
+void Scatter::AddSRP(int64_t address, int32_t length) {
+  SRP srp;
+  srp.address = address;
+  srp.length = length;
+  srp.scatter.qwA = address;
+  srp.scatter.cb = length;
+  srp.scatter.pb = srp.buffer.data();
+  AddSRP(srp);
+}
+
+bool Scatter::RemoveSRP(const SRP& srp) { return RemoveSRP(srp.address); }
+
+bool Scatter::RemoveSRP(int64_t address) {
+  auto it = srp_map_.find(address);
+  if (it == srp_map_.end()) {
+    return false;
+  }
+  srp_map_.erase(it);
+  return true;
+}
+
+SRP* Scatter::GetSRP(int64_t address) {
+  auto it = srp_map_.find(address);
+  if (it == srp_map_.end()) {
+    return nullptr;
+  }
+  return &(it->second);
+}
+
+std::vector<uint8_t>& Scatter::GetData(int64_t address) {
+  auto it = srp_map_.find(address);
+  if (it == srp_map_.end()) {
+    throw std::runtime_error("SRP not exist.");
+  }
+  return it->second.buffer;
+}
+
+const std::map<int64_t, SRP>& Scatter::SRPMap() noexcept { return srp_map_; }
+
+bool Scatter::ExecuteRead() {
+  auto io = handle_.lock();
+  std::vector<PMEM_SCATTER> ppmems;
+  for (auto it : srp_map_) {
+    ppmems.push_back(&(it.second.scatter));
+  }
+  return io->Call(MemReadScatter, pid_, ppmems.data(), ppmems.size(), flags_);
+}
+
+bool Scatter::ExecuteWrite() {
+  auto io = handle_.lock();
+  std::vector<PMEM_SCATTER> ppmems;
+  for (auto it : srp_map_) {
+    ppmems.push_back(&(it.second.scatter));
+  }
+  return io->Call(MemWriteScatter, pid_, ppmems.data(), ppmems.size());
+}
+
+void Scatter::SetPID(uint32_t pid) { pid_ = pid; }
+void Scatter::SetFlags(uint32_t flags) { flags_ = flags; }
 }  // namespace VMM

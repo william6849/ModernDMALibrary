@@ -43,28 +43,27 @@ std::vector<uint8_t> MemReadEx(const VMM_HANDLE handle, const uint32_t pid,
 bool MemWrite(const VMM_HANDLE handle, const uint32_t pid, const uint64_t addr,
               std::vector<uint8_t>& data);
 
-struct ScatterRequestPackage {
-  DWORD version = MEM_SCATTER_VERSION;
-  bool f = false;
-  int64_t address;
-  uint8_t* pb = buffer.data();
-  int64_t _filler;
-  int32_t length = 4096;
-  int32_t iStack;
-  int64_t vStack[MEM_SCATTER_STACK_SIZE];
+int32_t MemReadScatter(const VMM_HANDLE hVMM, const int32_t dwPID,
+                       PPMEM_SCATTER ppMEMs, int32_t cpMEMs, int32_t flags);
+int32_t MemWriteScatter(const VMM_HANDLE hVMM, int32_t dwPID,
+                        PPMEM_SCATTER ppMEMs, int32_t cpMEMs);
 
+struct ScatterRequestPackage {
+  MEM_SCATTER scatter{.version = MEM_SCATTER_VERSION, .f = false, .cb = 4096};
+  int64_t address;
+  int32_t length = 4096;
   std::vector<uint8_t> buffer;
 };
 typedef ScatterRequestPackage SRP;
 
 class Scatter {
  public:
-  Scatter(const HandleWrapper<VMM_HANDLE>& handle_wrapper);
-  Scatter(uint32_t pid, uint32_t flags);
+  Scatter(const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>>& handle_wrapper,
+          uint32_t pid, uint32_t flags);
 
-  bool AddSRP(const SRP& srp);
-  bool AddSRP(const std::vector<SRP>& srps);
-  bool AddSRP(int64_t address, int32_t length);
+  void AddSRP(const SRP& srp);
+  void AddSRP(const std::vector<SRP>& srps);
+  void AddSRP(int64_t address, int32_t length);
   bool RemoveSRP(const SRP& srp);
   bool RemoveSRP(int64_t address);
   SRP* GetSRP(int64_t address);
@@ -83,6 +82,7 @@ class Scatter {
   uint32_t pid_;
   uint32_t flags_;
   std::chrono::system_clock::time_point last_execution_;
+  std::weak_ptr<HandleWrapper<tdVMM_HANDLE>> handle_;
 };
 };  // namespace VMM
 
