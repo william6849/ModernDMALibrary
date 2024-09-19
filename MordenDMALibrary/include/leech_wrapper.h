@@ -20,6 +20,10 @@ class HandleWrapper {
   template <typename Func, typename... Args>
   auto Call(Func&& func, Args&&... args);
 
+  template <class Rep, class Period, typename Func, typename... Args>
+  auto Call(const std::chrono::duration<Rep, Period>& timeout, Func&& func,
+            Args&&... args);
+
   void reset(T* handle, void (*deleter)(T*));
   T* get() const;
   operator T*() const;
