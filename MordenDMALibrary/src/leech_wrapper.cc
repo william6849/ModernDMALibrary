@@ -42,9 +42,10 @@ std::vector<uint8_t> MemReadEx(const VMM_HANDLE handle, const uint32_t pid,
                                uint32_t flag) {
   std::vector<uint8_t> ret(bytes);
   uint32_t read_bytes = 0;
-  auto result = VMMDLL_MemReadEx(handle, static_cast<DWORD>(pid), addr,
-                                 ret.data(), static_cast<DWORD>(bytes),
-                                 &read_bytes, static_cast<DWORD>(flag));
+  auto result = VMMDLL_MemReadEx(
+      handle, static_cast<DWORD>(pid), static_cast<ULONG64>(addr),
+      static_cast<PBYTE>(ret.data()), static_cast<DWORD>(bytes),
+      reinterpret_cast<PDWORD>(&read_bytes), static_cast<DWORD>(flag));
   if (result == 0) {
     throw std::runtime_error("MemRead error");
   }
@@ -54,9 +55,9 @@ std::vector<uint8_t> MemReadEx(const VMM_HANDLE handle, const uint32_t pid,
 
 bool MemWrite(const VMM_HANDLE handle, const uint32_t pid, const uint64_t addr,
               std::vector<uint8_t>& data) {
-  uint32_t write_bytes = 0;
-  auto result = VMMDLL_MemWrite(handle, static_cast<DWORD>(pid), addr,
-                                data.data(), static_cast<DWORD>(data.size()));
+  auto result = VMMDLL_MemWrite(
+      handle, static_cast<DWORD>(pid), static_cast<ULONG64>(addr),
+      static_cast<PBYTE>(data.data()), static_cast<DWORD>(data.size()));
   if (result == false) {
     throw std::runtime_error("MemWrite error");
   }
