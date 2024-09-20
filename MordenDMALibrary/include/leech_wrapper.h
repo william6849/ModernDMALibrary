@@ -2,6 +2,7 @@
 #define LEECH_WRAPPER_H
 
 #include <chrono>
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <mutex>

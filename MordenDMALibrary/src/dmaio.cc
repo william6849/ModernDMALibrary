@@ -4,7 +4,6 @@
 #include <future>
 #include <sstream>
 #include <stdexcept>
-#include <vector>
 
 #include "spdlog/spdlog.h"
 
