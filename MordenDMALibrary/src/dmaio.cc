@@ -37,10 +37,17 @@ void OptionProxy<S>::Write(const uint64_t& val) {
   value_ = static_cast<S>(val);
 }
 
-DMAIO::DMAIO() : vmm_handle_(mutex_, NULL), lc_handle_(mutex_, NULL) {}
+DMAIO::DMAIO()
+    : mutex_(std::make_shared<std::mutex>()),
+      vmm_handle_(
+          new HandleWrapper<tdVMM_HANDLE>(mutex_, NULL, VMM::HandleDeleter)),
+      lc_handle_(new HandleWrapper<void>(mutex_, NULL, LC::HandleDeleter)) {}
 
 DMAIO::DMAIO(const std::string& params)
-    : vmm_handle_(mutex_, NULL), lc_handle_(mutex_, NULL) {
+    : mutex_(std::make_shared<std::mutex>()),
+      vmm_handle_(
+          new HandleWrapper<tdVMM_HANDLE>(mutex_, NULL, VMM::HandleDeleter)),
+      lc_handle_(new HandleWrapper<void>(mutex_, NULL, LC::HandleDeleter)) {
   this->Init(params);
 }
 
@@ -70,7 +77,7 @@ void DMAIO::Init(const std::string& params) {
     exit(0);
   }
 
-  vmm_handle_->reset(vmm_handle, VMM::HandleDeleter);
+  vmm_handle_->reset(vmm_handle);
 
   spdlog::debug("VMMDLL_Initialize return address: {}",
                 static_cast<void*>(vmm_handle));
@@ -86,7 +93,7 @@ void DMAIO::Init(const std::string& params) {
   BYTE cmd[4] = {0x10, 0x00, 0x10, 0x00};
   LcCommand(leechcore_handler, LC_CMD_FPGA_CFGREGPCIE_MARKWR | 0x002, 4, cmd,
             NULL, NULL);
-  lc_handle_->reset(leechcore_handler, LC::HandleDeleter);
+  lc_handle_->reset(leechcore_handler);
 
   spdlog::info("Device IO initialized");
 }

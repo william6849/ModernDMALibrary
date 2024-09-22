@@ -14,8 +14,8 @@
 template <typename T>
 class HandleWrapper {
  public:
-  HandleWrapper(std::shared_ptr<std::mutex>& mutex, T* handle);
-  HandleWrapper(std::shared_ptr<std::mutex>& mutex, T* handle,
+  HandleWrapper(std::shared_ptr<std::mutex> mutex, T* handle);
+  HandleWrapper(std::shared_ptr<std::mutex> mutex, T* handle,
                 void (*deleter)(T*));
 
   template <typename Func, typename... Args>
@@ -25,7 +25,7 @@ class HandleWrapper {
   auto Call(const std::chrono::duration<Rep, Period>& timeout, Func&& func,
             Args&&... args);
 
-  void reset(T* handle, void (*deleter)(T*));
+  void reset(T* handle);
   T* get() const;
   operator T*() const;
 

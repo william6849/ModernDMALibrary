@@ -1,17 +1,13 @@
 #include <future>
 
 template <typename T>
-HandleWrapper<T>::HandleWrapper(std::shared_ptr<std::mutex>& mutex, T* handle) {
-  mutex_ = mutex;
-  handle_ = std::unique_ptr<T>(handle);
-}
+HandleWrapper<T>::HandleWrapper(std::shared_ptr<std::mutex> mutex, T* handle)
+    : mutex_(mutex), handle_(handle, nullptr) {}
 
 template <typename T>
-HandleWrapper<T>::HandleWrapper(std::shared_ptr<std::mutex>& mutex, T* handle,
-                                void (*deleter)(T*)) {
-  mutex_ = mutex;
-  handle_ = std::unique_ptr<T, void (*)(T*)>(handle, deleter);
-}
+HandleWrapper<T>::HandleWrapper(std::shared_ptr<std::mutex> mutex, T* handle,
+                                void (*deleter)(T*))
+    : mutex_(mutex), handle_(handle, deleter) {}
 
 template <typename T>
 template <typename Func, typename... Args>
@@ -20,6 +16,7 @@ auto HandleWrapper<T>::Call(Func&& func, Args&&... args) {
   if (!mutex) {
     throw std::runtime_error("Null mutex");
   }
+
   std::lock_guard<std::mutex> lock(*mutex);
   return func(handle_.get(), std::forward<Args>(args)...);
 }
@@ -46,7 +43,7 @@ auto HandleWrapper<T>::Call(const std::chrono::duration<Rep, Period>& timeout,
 }
 
 template <typename T>
-void HandleWrapper<T>::reset(T* handle, void (*deleter)(T*)) {
+void HandleWrapper<T>::reset(T* handle) {
   handle_.reset(handle);
 }
 
