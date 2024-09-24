@@ -3,6 +3,7 @@
 
 #include <chrono>
 #include <cstdint>
+#include <functional>
 #include <map>
 #include <memory>
 #include <unordered_map>
@@ -14,7 +15,7 @@ template <typename T>
 class HandleWrapper {
  public:
   HandleWrapper(T* handle);
-  HandleWrapper(T* handle, void (*deleter)(T*));
+  HandleWrapper(T* handle, std::function<void(T*)> deleter);
 
   template <typename Func, typename... Args>
   auto Call(Func&& func, Args&&... args);
@@ -28,7 +29,7 @@ class HandleWrapper {
   operator T*() const;
 
  private:
-  std::unique_ptr<T, void (*)(T*)> handle_;
+  std::unique_ptr<T, std::function<void(T*)>> handle_;
 };
 #include "handle_wrapper.tcc"
 

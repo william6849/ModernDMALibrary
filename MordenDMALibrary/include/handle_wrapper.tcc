@@ -1,12 +1,12 @@
 #include <future>
 
 template <typename T>
-HandleWrapper<T>::HandleWrapper( T* handle)
+HandleWrapper<T>::HandleWrapper(T* handle)
     : handle_(handle, nullptr) {}
 
 template <typename T>
-HandleWrapper<T>::HandleWrapper( T* handle,
-                                void (*deleter)(T*))
+HandleWrapper<T>::HandleWrapper(T* handle,
+                                std::function<void(T*)> deleter)
     :handle_(handle, deleter) {}
 
 template <typename T>
