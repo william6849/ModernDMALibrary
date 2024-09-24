@@ -32,6 +32,11 @@ ExternalProject_Add(
 
 ExternalProject_Get_Property(LeechCore SOURCE_DIR)
 set(LEECHCORE_RESOURCE_DIR ${SOURCE_DIR})
+set_target_properties(LeechCore PROPERTIES
+    BUILD_RPATH "."
+    INSTALL_RPATH "."
+    INSTALL_RPATH_USE_LINK_PATH TRUE
+)
 
 add_library(leechcorelib SHARED IMPORTED GLOBAL)
 add_dependencies(leechcorelib LeechCore)

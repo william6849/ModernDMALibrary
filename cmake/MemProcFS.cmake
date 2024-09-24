@@ -32,6 +32,11 @@ ExternalProject_Add(
 
 ExternalProject_Get_Property(MemProcFS SOURCE_DIR)
 set(MEMPROCFS_RESOURCE_DIR ${SOURCE_DIR})
+set_target_properties(MemProcFS PROPERTIES
+    BUILD_RPATH "."
+    INSTALL_RPATH "."
+    INSTALL_RPATH_USE_LINK_PATH TRUE
+)
 
 add_library(memprocfslib SHARED IMPORTED GLOBAL)
 add_dependencies(memprocfslib MemProcFS)
