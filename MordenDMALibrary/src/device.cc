@@ -1,7 +1,6 @@
 #include "device.h"
 
-Device::Device(const std::string& params)
-    : io_(params), options(io_.vmm_handle()) {};
+Device::Device(const std::string& params) : io_(params), options(nullptr) {};
 
 std::vector<uint8_t> Device::Read(uint64_t addr, size_t bytes) const {
   return io_.Read(addr, bytes);

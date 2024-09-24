@@ -38,16 +38,12 @@ void OptionProxy<S>::Write(const uint64_t& val) {
 }
 
 DMAIO::DMAIO()
-    : mutex_(std::make_shared<std::mutex>()),
-      vmm_handle_(
-          new HandleWrapper<tdVMM_HANDLE>(mutex_, NULL, VMM::HandleDeleter)),
-      lc_handle_(new HandleWrapper<void>(mutex_, NULL, LC::HandleDeleter)) {}
+    : vmm_handle_(new HandleWrapper<tdVMM_HANDLE>(NULL, VMM::HandleDeleter)),
+      lc_handle_(new HandleWrapper<void>(NULL, LC::HandleDeleter)) {}
 
 DMAIO::DMAIO(const std::string& params)
-    : mutex_(std::make_shared<std::mutex>()),
-      vmm_handle_(
-          new HandleWrapper<tdVMM_HANDLE>(mutex_, NULL, VMM::HandleDeleter)),
-      lc_handle_(new HandleWrapper<void>(mutex_, NULL, LC::HandleDeleter)) {
+    : vmm_handle_(new HandleWrapper<tdVMM_HANDLE>(NULL, VMM::HandleDeleter)),
+      lc_handle_(new HandleWrapper<void>(NULL, LC::HandleDeleter)) {
   this->Init(params);
 }
 

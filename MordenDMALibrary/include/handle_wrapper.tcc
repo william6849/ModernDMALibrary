@@ -1,23 +1,17 @@
 #include <future>
 
 template <typename T>
-HandleWrapper<T>::HandleWrapper(std::shared_ptr<std::mutex> mutex, T* handle)
-    : mutex_(mutex), handle_(handle, nullptr) {}
+HandleWrapper<T>::HandleWrapper( T* handle)
+    : handle_(handle, nullptr) {}
 
 template <typename T>
-HandleWrapper<T>::HandleWrapper(std::shared_ptr<std::mutex> mutex, T* handle,
+HandleWrapper<T>::HandleWrapper( T* handle,
                                 void (*deleter)(T*))
-    : mutex_(mutex), handle_(handle, deleter) {}
+    :handle_(handle, deleter) {}
 
 template <typename T>
 template <typename Func, typename... Args>
 auto HandleWrapper<T>::Call(Func&& func, Args&&... args) {
-  auto mutex = mutex_.lock();
-  if (!mutex) {
-    throw std::runtime_error("Null mutex");
-  }
-
-  std::lock_guard<std::mutex> lock(*mutex);
   return func(handle_.get(), std::forward<Args>(args)...);
 }
 
@@ -25,12 +19,6 @@ template <typename T>
 template <class Rep, class Period, typename Func, typename... Args>
 auto HandleWrapper<T>::Call(const std::chrono::duration<Rep, Period>& timeout,
                             Func&& func, Args&&... args) {
-  auto mutex = mutex_.lock();
-  if (!mutex) {
-    throw std::runtime_error("Null mutex");
-  }
-  std::lock_guard<std::mutex> lock(*mutex);
-
   auto asyncer = std::async(std::launch::async, [&]() {
     return func(handle_.get(), std::forward<Args>(args)...);
   });
