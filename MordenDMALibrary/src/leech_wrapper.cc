@@ -77,10 +77,9 @@ int32_t MemWriteScatter(const VMM_HANDLE handle, int32_t pid,
   return VMMDLL_MemWriteScatter(handle, pid, ppmems, cpmems);
 }
 
-Scatter::Scatter(uint32_t pid = -1,
-                 uint32_t flags = VMMDLL_FLAG_NOCACHE |
-                                  VMMDLL_FLAG_ZEROPAD_ON_FAIL |
-                                  VMMDLL_FLAG_NOPAGING)
+Scatter::Scatter(uint32_t pid, uint32_t flags = VMMDLL_FLAG_NOCACHE |
+                                                VMMDLL_FLAG_ZEROPAD_ON_FAIL |
+                                                VMMDLL_FLAG_NOPAGING)
     : pid_(pid), flags_(flags) {}
 
 void Scatter::AddSRP(const SRP& srp) { srp_map_[srp.address] = srp; }
