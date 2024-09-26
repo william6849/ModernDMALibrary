@@ -44,8 +44,8 @@ auto DMATaskExecutor::Call(const std::chrono::duration<Rep, Period>&& timeout,
 
 template <typename Func>
 auto DMATaskExecutor::Producer(Func&& task, uint8_t priority)
-    -> std::future<typename std::result_of<Func()>::type> {
-  using result_type = typename std::result_of<Func()>::type;
+    -> std::future<typename std::invoke_result<Func>::type> {
+  using result_type = typename std::invoke_result<Func>::type;
   auto result_promise = std::make_shared<std::promise<result_type>>();
   auto result_future = result_promise->get_future();
 

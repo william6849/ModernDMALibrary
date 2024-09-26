@@ -52,7 +52,7 @@ class DMATaskExecutor {
 
   template <typename Func>
   auto Producer(Func&& task, uint8_t priority)
-      -> std::future<typename std::result_of<Func()>::type>;
+      -> std::future<typename std::invoke_result<Func>::type>;
 
   std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> vmm_handle_;
   std::shared_ptr<HandleWrapper<void>> lc_handle_;
