@@ -77,14 +77,11 @@ int32_t MemWriteScatter(const VMM_HANDLE handle, int32_t pid,
   return VMMDLL_MemWriteScatter(handle, pid, ppmems, cpmems);
 }
 
-Scatter::Scatter(
-    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>>& handle_wrapper,
-    uint32_t pid = -1,
-    uint32_t flags = VMMDLL_FLAG_NOCACHE | VMMDLL_FLAG_ZEROPAD_ON_FAIL |
-                     VMMDLL_FLAG_NOPAGING)
-    : pid_(pid), flags_(flags) {
-  handle_ = handle_wrapper;
-}
+Scatter::Scatter(uint32_t pid = -1,
+                 uint32_t flags = VMMDLL_FLAG_NOCACHE |
+                                  VMMDLL_FLAG_ZEROPAD_ON_FAIL |
+                                  VMMDLL_FLAG_NOPAGING)
+    : pid_(pid), flags_(flags) {}
 
 void Scatter::AddSRP(const SRP& srp) { srp_map_[srp.address] = srp; }
 
@@ -133,23 +130,9 @@ std::vector<uint8_t>& Scatter::GetData(int64_t address) {
 
 const std::map<int64_t, SRP>& Scatter::SRPMap() noexcept { return srp_map_; }
 
-bool Scatter::ExecuteRead() {
-  auto io = handle_.lock();
-  std::vector<PMEM_SCATTER> ppmems;
-  for (auto it : srp_map_) {
-    ppmems.push_back(&(it.second.scatter));
-  }
-  return io->Call(MemReadScatter, pid_, ppmems.data(), ppmems.size(), flags_);
-}
+bool Scatter::ExecuteRead() { return false; }
 
-bool Scatter::ExecuteWrite() {
-  auto io = handle_.lock();
-  std::vector<PMEM_SCATTER> ppmems;
-  for (auto it : srp_map_) {
-    ppmems.push_back(&(it.second.scatter));
-  }
-  return io->Call(MemWriteScatter, pid_, ppmems.data(), ppmems.size());
-}
+bool Scatter::ExecuteWrite() { return false; }
 
 void Scatter::SetPID(uint32_t pid) { pid_ = pid; }
 void Scatter::SetFlags(uint32_t flags) { flags_ = flags; }

@@ -6,15 +6,15 @@
 #include <string>
 #include <vector>
 
+#include "io_proc.h"
 #include "leech_wrapper.h"
 
 template <typename S>
 class OptionProxy {
  public:
-  explicit OptionProxy(
-      const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>>& handle, uint64_t opt,
-      bool read, bool write);
-  OptionProxy& operator=(const uint64_t& val) {
+  explicit OptionProxy(const std::shared_ptr<DMATaskExecutor>& dma_exec,
+                       uint64_t opt, bool read, bool write);
+  OptionProxy& operator=(const uint64_t val) {
     Write(val);
     return *this;
   };
@@ -35,13 +35,13 @@ class OptionProxy {
   uint64_t opt_ = 0;
   bool read_ = false;
   bool write_ = false;
-  std::weak_ptr<HandleWrapper<tdVMM_HANDLE>> io_;
+  std::weak_ptr<DMATaskExecutor> dma_exec_;
 };
 
 namespace Target {
 class Options {
  public:
-  Options(const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>>& handle);
+  Options(const std::shared_ptr<DMATaskExecutor> dma_exec);
   OptionProxy<uint64_t> CORE_PRINTF_ENABLE;
   OptionProxy<uint64_t> CORE_VERBOSE;
   OptionProxy<uint64_t> CORE_VERBOSE_EXTRA;
@@ -98,13 +98,11 @@ class DMAIO {
   bool Write(uint32_t pid, uint64_t virtual_addr,
              std::vector<uint8_t>& data) const;
 
-  operator VMM_HANDLE() const;
   const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> vmm_handle() const;
 
  private:
   void Init(const std::string& params);
-  std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> vmm_handle_;
-  std::shared_ptr<HandleWrapper<void>> lc_handle_;
+  std::shared_ptr<DMATaskExecutor> dma_exec_;
 };
 
 #endif

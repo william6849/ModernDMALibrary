@@ -17,13 +17,6 @@ class HandleWrapper {
   HandleWrapper(T* handle);
   HandleWrapper(T* handle, std::function<void(T*)> deleter);
 
-  template <typename Func, typename... Args>
-  auto Call(Func&& func, Args&&... args);
-
-  template <class Rep, class Period, typename Func, typename... Args>
-  auto Call(const std::chrono::duration<Rep, Period>& timeout, Func&& func,
-            Args&&... args);
-
   void reset(T* handle);
   T* get() const;
   operator T*() const;
@@ -31,7 +24,7 @@ class HandleWrapper {
  private:
   std::unique_ptr<T, std::function<void(T*)>> handle_;
 };
-#include "handle_wrapper.tcc"
+#include "leech_wrapper.tcc"
 
 namespace LC {
 void HandleDeleter(HANDLE handle);
@@ -61,8 +54,7 @@ typedef ScatterRequestPackage SRP;
 
 class Scatter {
  public:
-  Scatter(const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>>& handle_wrapper,
-          uint32_t pid, uint32_t flags);
+  Scatter(uint32_t pid, uint32_t flags);
 
   void AddSRP(const SRP& srp);
   void AddSRP(const std::vector<SRP>& srps);
@@ -85,7 +77,6 @@ class Scatter {
   uint32_t pid_;
   uint32_t flags_;
   std::chrono::system_clock::time_point last_execution_;
-  std::weak_ptr<HandleWrapper<tdVMM_HANDLE>> handle_;
 };
 };  // namespace VMM
 
