@@ -173,7 +173,7 @@
       "name": "code-analysis",
       "displayName": "Code Analysis",
       "inherits": [
-        "unixlike-gcc-debug"
+        "unixlike-clang-debug"
       ],
       "cacheVariables": {
         "CODE_COVERAGE": "ON",
