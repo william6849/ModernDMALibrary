@@ -18,9 +18,7 @@ jobs:
 
       - name: Run clang-tidy
         run: |
-          cd build
-          run-clang-tidy -p ./code-analysis | tee clang-tidy-output.txt
-          cd -
+          run-clang-tidy -clang-tidy-binary clang-tidy-18 -config-file clang-tidy-config -p ./build/code-analysis -j 4 | tee build/clang-tidy-output.txt
 
       - name: Run Codacy Analysis CLI
         uses: codacy/codacy-analysis-cli-action@97bf5df3c09e75f5bcd72695998f96ebd701846e
