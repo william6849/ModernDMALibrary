@@ -51,7 +51,6 @@ std::vector<uint8_t> MemReadEx(const VMM_HANDLE handle, const uint32_t pid,
   if (result == 0) {
     throw std::runtime_error("MemRead error");
   }
-  spdlog::debug("VMM::Read at {:x}: {}", addr, spdlog::to_hex(ret));
   return std::move(ret);
 }
 
@@ -63,7 +62,6 @@ bool MemWrite(const VMM_HANDLE handle, const int32_t pid, const uint64_t addr,
   if (result == false) {
     throw std::runtime_error("MemWrite error");
   }
-  spdlog::debug("VMM::Write at {:x}: {}", addr, spdlog::to_hex(data));
   return result;
 }
 
