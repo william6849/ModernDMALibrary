@@ -36,7 +36,7 @@ VMM_HANDLE Initialize(const std::string& arguments);
 std::vector<uint8_t> MemReadEx(const VMM_HANDLE handle, const uint32_t pid,
                                const uint64_t addr, const size_t bytes,
                                uint32_t flag);
-bool MemWrite(const VMM_HANDLE handle, const uint32_t pid, const uint64_t addr,
+bool MemWrite(const VMM_HANDLE handle, const int32_t pid, const uint64_t addr,
               std::vector<uint8_t>& data);
 
 int32_t MemReadScatter(const VMM_HANDLE hVMM, const int32_t dwPID,

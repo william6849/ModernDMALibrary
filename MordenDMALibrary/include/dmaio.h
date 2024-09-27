@@ -84,21 +84,21 @@ class Options {
 };
 
 }  // namespace Target
+
 class DMAIO {
  public:
   DMAIO();
   DMAIO(const std::string& params);
   void Reset(const std::string& params);
 
-  std::vector<uint8_t> Read(uint64_t physical_addr, size_t bytes) const;
-  bool Write(uint64_t physical_addr, std::vector<uint8_t>& data) const;
-
-  std::vector<uint8_t> Read(uint32_t pid, uint64_t virtual_addr,
-                            size_t bytes) const;
-  bool Write(uint32_t pid, uint64_t virtual_addr,
-             std::vector<uint8_t>& data) const;
+  std::future<std::vector<uint8_t>> Read(uint32_t pid, uint64_t virtual_addr,
+                                         size_t bytes) const;
+  std::future<bool> Write(int32_t pid, uint64_t virtual_addr,
+                          const std::vector<uint8_t>& data) const;
 
   const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> vmm_handle() const;
+
+  const std::shared_ptr<DMATaskExecutor> GetExecutor();
 
  private:
   void Init(const std::string& params);

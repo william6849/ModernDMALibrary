@@ -9,11 +9,13 @@ bool DMATask::operator<(const DMATask& other) const {
 DMATaskExecutor::DMATaskExecutor()
     : vmm_handle_(new HandleWrapper<tdVMM_HANDLE>(NULL, VMM::HandleDeleter)),
       lc_handle_(new HandleWrapper<void>(NULL, LC::HandleDeleter)),
-      stopped(false) {}
+      stopped(false),
+      work_thread(&DMATaskExecutor::TaskConsumer, this) {}
 
 DMATaskExecutor::~DMATaskExecutor() {
   stopped = true;
   queue_cv.notify_all();
+  work_thread.join();
 }
 
 void DMATaskExecutor::SetIOHandler(VMM_HANDLE handle) {
@@ -28,7 +30,7 @@ const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> DMATaskExecutor::vmm_handle()
   return vmm_handle_;
 }
 
-void DMATaskExecutor::Consumer() {
+void DMATaskExecutor::TaskConsumer() {
   while (true) {
     std::unique_lock<std::mutex> lock(queue_mutex);
     queue_cv.wait(lock, [&] { return !dmatask_queue.empty() || stopped; });

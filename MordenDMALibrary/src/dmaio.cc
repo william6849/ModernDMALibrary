@@ -18,8 +18,10 @@ S OptionProxy<S>::Read() {
     spdlog::error("Invalid read access: {}", __func__);
   }
 
-  if (!dma_exec_.lock()->VMMCall(VMMDLL_ConfigGet, static_cast<ULONG64>(opt_),
-                                 reinterpret_cast<PULONG64>(&value_))) {
+  if (!dma_exec_.lock()
+           ->VMMCall(VMMDLL_ConfigGet, static_cast<ULONG64>(opt_),
+                     reinterpret_cast<PULONG64>(&value_))
+           .get()) {
     spdlog::error("VMMDLL_ConfigGet Failed");
   }
   return value_;
@@ -31,8 +33,10 @@ void OptionProxy<S>::Write(const uint64_t& val) {
     spdlog::error("Invalid write access");
   }
 
-  if (!dma_exec_.lock()->VMMCall(VMMDLL_ConfigSet, static_cast<ULONG64>(opt_),
-                                 static_cast<ULONG64>(val))) {
+  if (!dma_exec_.lock()
+           ->VMMCall(VMMDLL_ConfigSet, static_cast<ULONG64>(opt_),
+                     static_cast<ULONG64>(val))
+           .get()) {
     spdlog::error("VMMDLL_ConfigSet Failed");
   }
   value_ = static_cast<S>(val);
@@ -47,6 +51,10 @@ DMAIO::DMAIO(const std::string& params)
 
 const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> DMAIO::vmm_handle() const {
   return dma_exec_->vmm_handle();
+}
+
+const std::shared_ptr<DMATaskExecutor> DMAIO::GetExecutor() {
+  return dma_exec_;
 }
 
 void DMAIO::Reset(const std::string& params) { this->Init(params); }
@@ -90,21 +98,14 @@ void DMAIO::Init(const std::string& params) {
   spdlog::info("Device IO initialized");
 }
 
-std::vector<uint8_t> DMAIO::Read(uint64_t physical_addr, size_t bytes) const {
-  return dma_exec_->VMMCall(VMM::MemReadEx, -1, physical_addr, bytes, 0);
-}
-
-bool DMAIO::Write(uint64_t physical_addr, std::vector<uint8_t>& data) const {
-  return dma_exec_->VMMCall(VMM::MemWrite, -1, physical_addr, data);
-}
-
-std::vector<uint8_t> DMAIO::Read(uint32_t pid, uint64_t virtual_addr,
-                                 size_t bytes) const {
+std::future<std::vector<uint8_t>> DMAIO::Read(uint32_t pid,
+                                              uint64_t virtual_addr,
+                                              size_t bytes) const {
   return dma_exec_->VMMCall(VMM::MemReadEx, pid, virtual_addr, bytes, 0);
 }
 
-bool DMAIO::Write(uint32_t pid, uint64_t virtual_addr,
-                  std::vector<uint8_t>& data) const {
+std::future<bool> DMAIO::Write(int32_t pid, uint64_t virtual_addr,
+                               const std::vector<uint8_t>& data) const {
   return dma_exec_->VMMCall(VMM::MemWrite, pid, virtual_addr, data);
 }
 

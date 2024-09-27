@@ -55,7 +55,7 @@ std::vector<uint8_t> MemReadEx(const VMM_HANDLE handle, const uint32_t pid,
   return std::move(ret);
 }
 
-bool MemWrite(const VMM_HANDLE handle, const uint32_t pid, const uint64_t addr,
+bool MemWrite(const VMM_HANDLE handle, const int32_t pid, const uint64_t addr,
               std::vector<uint8_t>& data) {
   auto result = VMMDLL_MemWrite(
       handle, static_cast<DWORD>(pid), static_cast<ULONG64>(addr),

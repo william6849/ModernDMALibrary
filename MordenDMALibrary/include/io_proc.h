@@ -44,15 +44,10 @@ class DMATaskExecutor {
   template <typename Func, typename... Args>
   auto Call(uint8_t priority, Func&& func, Args&&... args);
 
-  template <class Rep, class Period, typename Func, typename... Args>
-  auto Call(const std::chrono::duration<Rep, Period>&& timeout, Func&& func,
-            Args&&... args);
-
-  void Consumer();
+  void TaskConsumer();
 
   template <typename Func>
-  auto Producer(Func&& task, uint8_t priority)
-      -> std::future<typename std::invoke_result<Func>::type>;
+  auto TaskProducer(Func&& task, uint8_t priority);
 
   std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> vmm_handle_;
   std::shared_ptr<HandleWrapper<void>> lc_handle_;
@@ -60,7 +55,7 @@ class DMATaskExecutor {
   std::mutex queue_mutex;
   std::condition_variable queue_cv;
   std::thread work_thread;
-  bool stopped;
+  std::atomic<bool> stopped;
 };
 #include "io_proc.tcc"
 
