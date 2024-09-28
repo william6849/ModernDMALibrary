@@ -2,9 +2,9 @@
 
 #include <chrono>
 #include <future>
-#include <sstream>
 #include <stdexcept>
 
+#include "io_proc.h"
 #include "spdlog/spdlog.h"
 
 template <typename S>

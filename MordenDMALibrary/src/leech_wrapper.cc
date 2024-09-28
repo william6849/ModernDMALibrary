@@ -2,7 +2,6 @@
 
 #include <sstream>
 
-#include "spdlog/fmt/bin_to_hex.h"
 #include "spdlog/spdlog.h"
 
 namespace LC {

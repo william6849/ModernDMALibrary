@@ -2,6 +2,7 @@
 #define IO_H
 
 #include <cstdint>
+#include <future>
 #include <memory>
 #include <string>
 #include <vector>

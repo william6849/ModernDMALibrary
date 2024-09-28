@@ -1,7 +1,5 @@
 #include "io_proc.h"
 
-#include "spdlog/spdlog.h"
-
 bool DMATask::operator<(const DMATask& other) const {
   return priority > other.priority;
 };

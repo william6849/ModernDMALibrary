@@ -6,7 +6,6 @@
 #include <functional>
 #include <map>
 #include <memory>
-#include <unordered_map>
 #include <vector>
 
 #include "vmmdll.h"
@@ -14,17 +13,19 @@
 template <typename T>
 class HandleWrapper {
  public:
-  HandleWrapper(T* handle);
-  HandleWrapper(T* handle, std::function<void(T*)> deleter);
+  HandleWrapper(T* handle) : handle_(handle, nullptr) {}
+  HandleWrapper(T* handle, std::function<void(T*)> deleter)
+      : handle_(handle, deleter) {}
 
-  void reset(T* handle);
-  T* get() const;
-  operator T*() const;
+  void reset(T* handle) { handle_.reset(handle); }
+
+  T* get() const { return handle_.get(); }
+
+  operator T*() const { return handle_.get(); }
 
  private:
   std::unique_ptr<T, std::function<void(T*)>> handle_;
 };
-#include "leech_wrapper.tcc"
 
 namespace LC {
 void HandleDeleter(HANDLE handle);
