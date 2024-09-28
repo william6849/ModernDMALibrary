@@ -30,14 +30,14 @@ jobs:
       - name: Run Unit Test
         run: |
           cd ./build/code-analysis/bin/
-          ./dmatest
+          ./unittest
           cd -
 
       - name: Generate coverage info
         run: |
           cd ./build/code-analysis/bin/
           llvm-profdata merge -sparse default.profraw -o coverage.profdata
-          llvm-cov export ./dmatese -instr-profile=coverage.profdata > coverage.json
+          llvm-cov export ./unittest -instr-profile=coverage.profdata > coverage.json
           cd -
 
       - name: Codecov
