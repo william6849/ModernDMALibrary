@@ -37,10 +37,10 @@ jobs:
         run: |
           cd ./build/code-analysis/bin/
           llvm-profdata merge -sparse default.profraw -o coverage.profdata
-          llvm-cov export ./unittest -instr-profile=coverage.profdata > coverage.json
+          llvm-cov export ./unittest -instr-profile=coverage.profdata -format=lcov > coverage.json
           cd -
 
-      - name: Codecov
+      - name: Upload Coverage to Codecov
         uses: codecov/codecov-action@v4.5.0
         with:
           fail_ci_if_error: true
