@@ -46,10 +46,7 @@ if(RUN_CLANG_TIDY_ON_TARGET)
                                       EXPORT_COMPILE_COMMANDS "ON")
 endif()
 
-if(CODE_COVERAGE)
-  target_compile_options(${TARGET_LIBRARY_NAME} PRIVATE "--coverage")
-  target_code_coverage(${TARGET_LIBRARY_NAME})
-endif()
+target_code_coverage(${TARGET_LIBRARY_NAME})
 
 # install settings
 install(

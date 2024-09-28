@@ -1,4 +1,4 @@
-name: Codacy Analysis
+name: Report Analysis
 
 on: ["push"]
 
@@ -35,13 +35,17 @@ jobs:
 
       - name: Generate coverage info
         run: |
-          cd ./build/code-analysis
-          lcov --capture --directory . --output-file coverage.info
-          lcov --ignore-errors unused --remove coverage.info '/usr/include/*' 'submodules' 'googletest' ".yaml" ".json" -o filtered_coverage.info
+          cd ./build/code-analysis/bin/
+          llvm-profdata merge -sparse default.profraw -o coverage.profdata
+          llvm-cov export ./dmatese -instr-profile=coverage.profdata > coverage.json
           cd -
 
-      - name: Run codacy-coverage-reporter
-        uses: codacy/codacy-coverage-reporter-action@89d6c85cfafaec52c72b6c5e8b2878d33104c699
+      - name: Codecov
+        uses: codecov/codecov-action@v4.5.0
         with:
-          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          coverage-reports: ./build/code-analysis/filtered_coverage.info
+          fail_ci_if_error: true
+          files: ./build/code-analysis/bin/coverage.json
+          flags: unittests
+          name: codecov-umbrella
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true
