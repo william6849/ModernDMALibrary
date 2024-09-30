@@ -21,6 +21,10 @@ class DMATaskExecutor {
  public:
   DMATaskExecutor();
   ~DMATaskExecutor();
+  DMATaskExecutor(const DMATaskExecutor& other) = delete;
+  DMATaskExecutor& operator=(const DMATaskExecutor& other) = delete;
+  DMATaskExecutor(DMATaskExecutor&& other) = delete;
+  DMATaskExecutor& operator=(DMATaskExecutor&& other) = delete;
 
   void SetIOHandler(VMM_HANDLE handle);
   void SetIOHandler(HANDLE handle);
