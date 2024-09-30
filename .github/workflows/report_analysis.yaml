@@ -9,11 +9,11 @@ jobs:
     steps:
       - name: Check git tokens
         run: |
-          if [ -z "${CODACY_PROJECT_TOKEN}" ]; then
+          if [ -z "${{ secrets.CODACY_PROJECT_TOKEN }}" ]; then
             echo "Error: CODACY_PROJECT_TOKEN is not set"
             exit 1
           fi
-          if [ -z "${CODECOV_TOKEN}" ]; then
+          if [ -z "${{ secrets.CODECOV_TOKEN }}" ]; then
             echo "Error: CODECOV_TOKEN is not set"
             exit 1
           fi
