@@ -61,11 +61,12 @@ void DMAIO::Reset(const std::string& params) { this->Init(params); }
 
 void DMAIO::Init(const std::string& params) {
   spdlog::info("Initializing VMM");
+  constexpr int32_t vmm_init_timeout = 60;
 
   auto async_vmm_init =
       std::async(std::launch::async, [&]() { return VMM::Initialize(params); });
 
-  if (async_vmm_init.wait_for(std::chrono::seconds(60)) ==
+  if (async_vmm_init.wait_for(std::chrono::seconds(vmm_init_timeout)) ==
       std::future_status::timeout) {
     spdlog::critical("VMM Initialize timeout, retry or reboot target fully.");
     exit(0);
@@ -90,9 +91,15 @@ void DMAIO::Init(const std::string& params) {
     throw std::runtime_error("LcCreate failed.");
   }
 
-  BYTE cmd[4] = {0x10, 0x00, 0x10, 0x00};
-  LcCommand(leechcore_handler, LC_CMD_FPGA_CFGREGPCIE_MARKWR | 0x002, 4, cmd,
-            NULL, NULL);
+  constexpr uint8_t value_high = 0x10;
+  constexpr uint8_t value_low = 0x00;
+  constexpr uint8_t mask_high = 0x10;
+  constexpr uint8_t mask_low = 0x00;
+  std::array<BYTE, 4> cmd = {value_high, value_low, mask_high, mask_low};
+  std::span<BYTE> span = cmd;
+
+  LcCommand(leechcore_handler, LC_CMD_FPGA_CFGREGPCIE_MARKWR | 0x002, 4,
+            span.data(), nullptr, nullptr);
   dma_exec_->SetIOHandler(leechcore_handler);
 
   spdlog::info("Device IO initialized");

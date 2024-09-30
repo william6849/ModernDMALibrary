@@ -39,14 +39,14 @@ VMM_HANDLE Initialize(const std::string& params) {
 }
 
 std::vector<uint8_t> MemReadEx(const VMM_HANDLE handle, const uint32_t pid,
-                               const uint64_t addr, const size_t bytes,
+                               const uint64_t addr, const std::size_t bytes,
                                uint32_t flag) {
   std::vector<uint8_t> ret(bytes);
-  uint32_t read_bytes = 0;
+  DWORD read_bytes = 0;
   auto result = VMMDLL_MemReadEx(
       handle, static_cast<DWORD>(pid), static_cast<ULONG64>(addr),
-      static_cast<PBYTE>(ret.data()), static_cast<DWORD>(bytes),
-      reinterpret_cast<PDWORD>(&read_bytes), static_cast<DWORD>(flag));
+      static_cast<PBYTE>(ret.data()), static_cast<DWORD>(bytes), &read_bytes,
+      static_cast<DWORD>(flag));
   if (result == 0) {
     throw std::runtime_error("MemRead error");
   }
@@ -64,13 +64,13 @@ bool MemWrite(const VMM_HANDLE handle, const int32_t pid, const uint64_t addr,
   return result;
 }
 
-int32_t MemReadScatter(const VMM_HANDLE handle, const int32_t pid,
-                       PPMEM_SCATTER ppmems, int32_t cpmems, int32_t flags) {
+uint32_t MemReadScatter(const VMM_HANDLE handle, const uint32_t pid,
+                        PPMEM_SCATTER ppmems, int32_t cpmems, int32_t flags) {
   return VMMDLL_MemReadScatter(handle, pid, ppmems, cpmems, flags);
 }
 
-int32_t MemWriteScatter(const VMM_HANDLE handle, int32_t pid,
-                        PPMEM_SCATTER ppmems, int32_t cpmems) {
+uint32_t MemWriteScatter(const VMM_HANDLE handle, const uint32_t pid,
+                         PPMEM_SCATTER ppmems, int32_t cpmems) {
   return VMMDLL_MemWriteScatter(handle, pid, ppmems, cpmems);
 }
 

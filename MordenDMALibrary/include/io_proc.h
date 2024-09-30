@@ -6,6 +6,7 @@
 #include <future>
 #include <mutex>
 #include <queue>
+#include <stdexcept>
 #include <thread>
 
 #include "leech_wrapper.h"
@@ -30,7 +31,7 @@ class DMATaskExecutor {
 
   template <typename Func, typename... Args>
   auto VMMCall(Func&& func, Args&&... args) {
-    return VMMCall(std::forward<uint8_t>(255), std::forward<Func>(func),
+    return VMMCall(DEFAULT_TASK_PRIORITY, std::forward<Func>(func),
                    std::forward<Args>(args)...);
   };
 
@@ -43,7 +44,7 @@ class DMATaskExecutor {
 
   template <typename Func, typename... Args>
   auto LCCall(Func&& func, Args&&... args) {
-    return LCCall(std::forward<uint8_t>(255), std::forward<Func>(func),
+    return LCCall(DEFAULT_TASK_PRIORITY, std::forward<Func>(func),
                   std::forward<Args>(args)...);
   }
 
@@ -62,6 +63,8 @@ class DMATaskExecutor {
 
   template <typename Func>
   auto TaskProducer(Func&& task, uint8_t priority);
+
+  static const uint8_t DEFAULT_TASK_PRIORITY = 255;
 
   std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> vmm_handle_;
   std::shared_ptr<HandleWrapper<void>> lc_handle_;

@@ -18,7 +18,7 @@ int32_t DeviceManager::OpenDevice(const std::string& params) {
     Device dev(params);
     device_list_.push_back(std::move(dev));
     spdlog::info("Device opened.");
-    return device_list_.size() - 1;
+    return static_cast<int32_t>(device_list_.size() - 1);
   } catch (const std::runtime_error& e) {
     spdlog::error("{}", e.what());
     throw e;

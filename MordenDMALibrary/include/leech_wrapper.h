@@ -31,27 +31,31 @@ namespace LC {
 void HandleDeleter(HANDLE handle);
 };
 namespace VMM {
+
+const int32_t DEFAULT_PAGE_BYTES = 4096;
+
 void HandleDeleter(VMM_HANDLE handle);
 
 VMM_HANDLE Initialize(const std::string& arguments);
 std::vector<uint8_t> MemReadEx(const VMM_HANDLE handle, const uint32_t pid,
-                               const uint64_t addr, const size_t bytes,
+                               const uint64_t addr, const std::size_t bytes,
                                uint32_t flag);
 bool MemWrite(const VMM_HANDLE handle, const int32_t pid, const uint64_t addr,
               std::vector<uint8_t>& data);
 
-int32_t MemReadScatter(const VMM_HANDLE hVMM, const int32_t dwPID,
-                       PPMEM_SCATTER ppMEMs, int32_t cpMEMs, int32_t flags);
-int32_t MemWriteScatter(const VMM_HANDLE hVMM, int32_t dwPID,
-                        PPMEM_SCATTER ppMEMs, int32_t cpMEMs);
+uint32_t MemReadScatter(const VMM_HANDLE hVMM, const uint32_t dwPID,
+                        PPMEM_SCATTER ppMEMs, int32_t cpMEMs, int32_t flags);
+uint32_t MemWriteScatter(const VMM_HANDLE hVMM, const uint32_t dwPID,
+                         PPMEM_SCATTER ppMEMs, int32_t cpMEMs);
 
 struct ScatterRequestPackage {
-  MEM_SCATTER scatter{.version = MEM_SCATTER_VERSION, .f = false, .cb = 4096};
+  MEM_SCATTER scatter{
+      .version = MEM_SCATTER_VERSION, .f = false, .cb = DEFAULT_PAGE_BYTES};
   int64_t address;
-  int32_t length = 4096;
+  int32_t length = DEFAULT_PAGE_BYTES;
   std::vector<uint8_t> buffer;
 };
-typedef ScatterRequestPackage SRP;
+using SRP = ScatterRequestPackage;
 
 class Scatter {
  public:

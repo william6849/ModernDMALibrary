@@ -93,7 +93,7 @@ class DMAIO {
   void Reset(const std::string& params);
 
   std::future<std::vector<uint8_t>> Read(uint32_t pid, uint64_t virtual_addr,
-                                         size_t bytes) const;
+                                         std::size_t bytes) const;
   std::future<bool> Write(int32_t pid, uint64_t virtual_addr,
                           const std::vector<uint8_t>& data) const;
 
