@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <future>
+#include <span>
 #include <stdexcept>
 
 #include "io_proc.h"
