@@ -106,9 +106,8 @@ void DMAIO::Init(const std::string& params) {
   spdlog::info("Device IO initialized");
 }
 
-std::future<std::vector<uint8_t>> DMAIO::Read(uint32_t pid,
-                                              uint64_t virtual_addr,
-                                              size_t bytes) const {
+std::future<std::optional<std::vector<uint8_t>>> DMAIO::Read(
+    uint32_t pid, uint64_t virtual_addr, size_t bytes) const {
   return dma_exec_->VMMCall(VMM::MemReadEx, pid, virtual_addr, bytes, 0);
 }
 

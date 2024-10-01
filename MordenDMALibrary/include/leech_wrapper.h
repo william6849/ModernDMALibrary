@@ -37,9 +37,11 @@ const int32_t DEFAULT_PAGE_BYTES = 4096;
 void HandleDeleter(VMM_HANDLE handle);
 
 VMM_HANDLE Initialize(const std::string& arguments);
-std::vector<uint8_t> MemReadEx(const VMM_HANDLE handle, const uint32_t pid,
-                               const uint64_t addr, const std::size_t bytes,
-                               uint32_t flag);
+std::optional<std::vector<uint8_t>> MemReadEx(const VMM_HANDLE handle,
+                                              const uint32_t pid,
+                                              const uint64_t addr,
+                                              const std::size_t bytes,
+                                              uint32_t flag);
 bool MemWrite(const VMM_HANDLE handle, const int32_t pid, const uint64_t addr,
               std::vector<uint8_t>& data);
 

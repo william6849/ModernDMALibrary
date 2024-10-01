@@ -18,7 +18,7 @@ TEST(DMATest, device_init) {
          std::future_status::timeout) {
   }
   auto ok = what.get();
-  spdlog::debug("VMM::Read at 0x{:x}: {}", 0x1000, spdlog::to_hex(ok));
+  spdlog::debug("VMM::Read at 0x{:x}: {}", 0x1000, spdlog::to_hex(ok.value()));
 
   // multi thread read test
   std::vector<std::thread> tasks;
@@ -26,7 +26,8 @@ TEST(DMATest, device_init) {
     tasks.emplace_back([dev, i]() {
       auto addr = 0x80000 * i;
       auto ret = dev.Read(addr, 0x200).get();  // blocking
-      spdlog::debug("VMM::Read at 0x{:x}: {}", addr, spdlog::to_hex(ret));
+      spdlog::debug("VMM::Read at 0x{:x}: {}", addr,
+                    spdlog::to_hex(ret.value()));
     });
     spdlog::debug("goed?");
   }

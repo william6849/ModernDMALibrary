@@ -1,5 +1,6 @@
 #include "leech_wrapper.h"
 
+#include <optional>
 #include <sstream>
 
 #include "spdlog/spdlog.h"
@@ -38,17 +39,19 @@ VMM_HANDLE Initialize(const std::string& params) {
   return VMMDLL_Initialize(c_str_vec.size(), c_str_vec.data());
 }
 
-std::vector<uint8_t> MemReadEx(const VMM_HANDLE handle, const uint32_t pid,
-                               const uint64_t addr, const std::size_t bytes,
-                               uint32_t flag) {
+std::optional<std::vector<uint8_t>> MemReadEx(const VMM_HANDLE handle,
+                                              const uint32_t pid,
+                                              const uint64_t addr,
+                                              const std::size_t bytes,
+                                              uint32_t flag) {
   std::vector<uint8_t> ret(bytes);
   DWORD read_bytes = 0;
   auto result = VMMDLL_MemReadEx(
       handle, static_cast<DWORD>(pid), static_cast<ULONG64>(addr),
       static_cast<PBYTE>(ret.data()), static_cast<DWORD>(bytes), &read_bytes,
       static_cast<DWORD>(flag));
-  if (result == 0) {
-    throw std::runtime_error("MemRead error");
+  if (!result) {
+    return {};
   }
   return std::move(ret);
 }
@@ -58,9 +61,6 @@ bool MemWrite(const VMM_HANDLE handle, const int32_t pid, const uint64_t addr,
   auto result = VMMDLL_MemWrite(
       handle, static_cast<DWORD>(pid), static_cast<ULONG64>(addr),
       static_cast<PBYTE>(data.data()), static_cast<DWORD>(data.size()));
-  if (result == false) {
-    throw std::runtime_error("MemWrite error");
-  }
   return result;
 }
 
