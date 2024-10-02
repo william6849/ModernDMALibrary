@@ -15,7 +15,7 @@ class Device {
       -> std::invoke_result_t<decltype(&DMAIO::Read), const DMAIO, uint32_t,
                               uint64_t, std::size_t>;
 
-  auto Write(uint64_t addr, const std::vector<uint8_t>& data) const
+  auto Write(uint64_t addr, std::vector<uint8_t>& data) const
       -> std::invoke_result_t<decltype(&DMAIO::Write), const DMAIO, uint32_t,
                               uint64_t, std::vector<uint8_t>&>;
 

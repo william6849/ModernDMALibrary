@@ -41,7 +41,7 @@ class DMATaskExecutor {
 
   template <typename Func, typename... Args>
   auto VMMCall(uint8_t priority, Func&& func, Args&&... args) {
-    auto future = Call(priority, std::forward<Func>(func), vmm_handle_->get(),
+    auto future = Call(priority, std::forward<Func>(func), vmm_handle_,
                        std::forward<Args>(args)...);
     return future;
   };
@@ -54,7 +54,7 @@ class DMATaskExecutor {
 
   template <typename Func, typename... Args>
   auto LCCall(uint8_t priority, Func&& func, Args&&... args) {
-    auto future = Call(priority, std::forward<Func>(func), lc_handle_->get(),
+    auto future = Call(priority, std::forward<Func>(func), lc_handle_,
                        std::forward<Args>(args)...);
     return future;
   }

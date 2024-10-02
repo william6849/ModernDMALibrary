@@ -18,14 +18,11 @@ S OptionProxy<S>::Read() {
   if (!read_) {
     spdlog::error("Invalid read access: {}", __func__);
   }
-
-  if (!dma_exec_.lock()
-           ->VMMCall(VMMDLL_ConfigGet, static_cast<ULONG64>(opt_),
-                     reinterpret_cast<PULONG64>(&value_))
-           .get()) {
+  uint64_t read_val;
+  if (!dma_exec_.lock()->VMMCall(VMM::ConfigGet, opt_, read_val).get()) {
     spdlog::error("VMMDLL_ConfigGet Failed");
   }
-  return value_;
+  return value_ = static_cast<typeof(value_)>(read_val);
 }
 
 template <typename S>
@@ -34,10 +31,7 @@ void OptionProxy<S>::Write(const uint64_t& val) {
     spdlog::error("Invalid write access");
   }
 
-  if (!dma_exec_.lock()
-           ->VMMCall(VMMDLL_ConfigSet, static_cast<ULONG64>(opt_),
-                     static_cast<ULONG64>(val))
-           .get()) {
+  if (!dma_exec_.lock()->VMMCall(VMM::ConfigSet, opt_, val).get()) {
     spdlog::error("VMMDLL_ConfigSet Failed");
   }
   value_ = static_cast<S>(val);
@@ -112,7 +106,7 @@ std::future<std::optional<std::vector<uint8_t>>> DMAIO::Read(
 }
 
 std::future<bool> DMAIO::Write(int32_t pid, uint64_t virtual_addr,
-                               const std::vector<uint8_t>& data) const {
+                               std::vector<uint8_t>& data) const {
   return dma_exec_->VMMCall(VMM::MemWrite, pid, virtual_addr, data);
 }
 

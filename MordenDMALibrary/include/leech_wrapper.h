@@ -37,18 +37,25 @@ const int32_t DEFAULT_PAGE_BYTES = 4096;
 void HandleDeleter(VMM_HANDLE handle);
 
 VMM_HANDLE Initialize(const std::string& arguments);
-std::optional<std::vector<uint8_t>> MemReadEx(const VMM_HANDLE handle,
-                                              const uint32_t pid,
-                                              const uint64_t addr,
-                                              const std::size_t bytes,
-                                              uint32_t flag);
-bool MemWrite(const VMM_HANDLE handle, const int32_t pid, const uint64_t addr,
+std::optional<std::vector<uint8_t>> MemReadEx(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, const uint64_t addr, const std::size_t bytes,
+    const uint32_t flag);
+bool MemWrite(const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+              const uint32_t pid, const uint64_t addr,
               std::vector<uint8_t>& data);
 
-uint32_t MemReadScatter(const VMM_HANDLE hVMM, const uint32_t dwPID,
-                        PPMEM_SCATTER ppMEMs, int32_t cpMEMs, int32_t flags);
-uint32_t MemWriteScatter(const VMM_HANDLE hVMM, const uint32_t dwPID,
-                         PPMEM_SCATTER ppMEMs, int32_t cpMEMs);
+bool ConfigGet(const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+               uint64_t, uint64_t&);
+bool ConfigSet(const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+               uint64_t, uint64_t);
+
+uint32_t MemReadScatter(const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> hVMM,
+                        const uint32_t dwPID, PPMEM_SCATTER ppMEMs,
+                        int32_t cpMEMs, int32_t flags);
+uint32_t MemWriteScatter(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> hVMM,
+    const uint32_t dwPID, PPMEM_SCATTER ppMEMs, int32_t cpMEMs);
 
 struct ScatterRequestPackage {
   MEM_SCATTER scatter{

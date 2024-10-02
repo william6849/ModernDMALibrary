@@ -10,7 +10,7 @@ auto Device::Read(uint64_t addr, size_t bytes) const
   return std::invoke(&DMAIO::Read, io_, -1, addr, bytes);
 }
 
-auto Device::Write(uint64_t addr, const std::vector<uint8_t>& data) const
+auto Device::Write(uint64_t addr, std::vector<uint8_t>& data) const
     -> std::invoke_result_t<decltype(&DMAIO::Write), const DMAIO, uint32_t,
                             uint64_t, std::vector<uint8_t>&> {
   return std::invoke(&DMAIO::Write, io_, -1, addr, data);

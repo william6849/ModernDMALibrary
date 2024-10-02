@@ -39,15 +39,14 @@ VMM_HANDLE Initialize(const std::string& params) {
   return VMMDLL_Initialize(c_str_vec.size(), c_str_vec.data());
 }
 
-std::optional<std::vector<uint8_t>> MemReadEx(const VMM_HANDLE handle,
-                                              const uint32_t pid,
-                                              const uint64_t addr,
-                                              const std::size_t bytes,
-                                              uint32_t flag) {
+std::optional<std::vector<uint8_t>> MemReadEx(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, const uint64_t addr, const std::size_t bytes,
+    const uint32_t flag) {
   std::vector<uint8_t> ret(bytes);
   DWORD read_bytes = 0;
   auto result = VMMDLL_MemReadEx(
-      handle, static_cast<DWORD>(pid), static_cast<ULONG64>(addr),
+      handle->get(), static_cast<DWORD>(pid), static_cast<ULONG64>(addr),
       static_cast<PBYTE>(ret.data()), static_cast<DWORD>(bytes), &read_bytes,
       static_cast<DWORD>(flag));
   if (!result) {
@@ -56,22 +55,38 @@ std::optional<std::vector<uint8_t>> MemReadEx(const VMM_HANDLE handle,
   return std::move(ret);
 }
 
-bool MemWrite(const VMM_HANDLE handle, const int32_t pid, const uint64_t addr,
+bool MemWrite(const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+              const uint32_t pid, const uint64_t addr,
               std::vector<uint8_t>& data) {
-  auto result = VMMDLL_MemWrite(
-      handle, static_cast<DWORD>(pid), static_cast<ULONG64>(addr),
+  bool result = VMMDLL_MemWrite(
+      handle->get(), static_cast<DWORD>(pid), static_cast<ULONG64>(addr),
       static_cast<PBYTE>(data.data()), static_cast<DWORD>(data.size()));
   return result;
 }
 
-uint32_t MemReadScatter(const VMM_HANDLE handle, const uint32_t pid,
-                        PPMEM_SCATTER ppmems, int32_t cpmems, int32_t flags) {
-  return VMMDLL_MemReadScatter(handle, pid, ppmems, cpmems, flags);
+bool ConfigGet(const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+               uint64_t opt, uint64_t& val) {
+  ULONG64 val_t;
+  auto ret = VMMDLL_ConfigGet(handle->get(), opt, &val_t);
+  val = val_t;
+  return ret;
 }
 
-uint32_t MemWriteScatter(const VMM_HANDLE handle, const uint32_t pid,
-                         PPMEM_SCATTER ppmems, int32_t cpmems) {
-  return VMMDLL_MemWriteScatter(handle, pid, ppmems, cpmems);
+bool ConfigSet(const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+               uint64_t opt, uint64_t val) {
+  return VMMDLL_ConfigSet(handle->get(), opt, val);
+}
+
+uint32_t MemReadScatter(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, PPMEM_SCATTER ppmems, int32_t cpmems, int32_t flags) {
+  return VMMDLL_MemReadScatter(handle->get(), pid, ppmems, cpmems, flags);
+}
+
+uint32_t MemWriteScatter(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, PPMEM_SCATTER ppmems, int32_t cpmems) {
+  return VMMDLL_MemWriteScatter(handle->get(), pid, ppmems, cpmems);
 }
 
 Scatter::Scatter(uint32_t pid, uint32_t flags = VMMDLL_FLAG_NOCACHE |
