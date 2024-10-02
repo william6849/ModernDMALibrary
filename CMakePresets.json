@@ -207,7 +207,6 @@
     {
       "name": "code-analysis",
       "displayName": "Code Analysis",
-      "cleanFirst": true,
       "configurePreset": "code-analysis"
     },
     {
