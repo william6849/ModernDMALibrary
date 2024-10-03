@@ -6,7 +6,6 @@
 #include <future>
 #include <mutex>
 #include <queue>
-#include <stdexcept>
 #include <thread>
 
 #include "leech_wrapper.h"
