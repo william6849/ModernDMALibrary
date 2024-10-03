@@ -29,6 +29,7 @@ jobs:
         uses: lukka/run-cmake@2ce8982be71b8e9a3c4d5e432135035afd1e76a7
         with:
           configurePreset: unixlike-${{ matrix.compiler }}-${{ matrix.build_type }}
+          buildPreset: unixlike-${{ matrix.compiler }}-${{ matrix.build_type }}
           
   Windows:
     runs-on: ${{ matrix.os }}
