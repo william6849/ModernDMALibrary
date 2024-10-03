@@ -18,11 +18,11 @@ S OptionProxy<S>::Read() {
   if (!read_) {
     spdlog::error("Invalid read access: {}", __func__);
   }
-  uint64_t read_val;
+  uint64_t read_val = 0;
   if (!dma_exec_.lock()->VMMCall(VMM::ConfigGet, opt_, read_val).get()) {
     spdlog::error("VMMDLL_ConfigGet Failed");
   }
-  return value_ = static_cast<typeof(value_)>(read_val);
+  return value_ = static_cast<decltype(value_)>(read_val);
 }
 
 template <typename S>

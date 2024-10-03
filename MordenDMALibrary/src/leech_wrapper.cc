@@ -66,7 +66,7 @@ bool MemWrite(const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
 
 bool ConfigGet(const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
                uint64_t opt, uint64_t& val) {
-  ULONG64 val_t;
+  ULONG64 val_t = 0;
   auto ret = VMMDLL_ConfigGet(handle->get(), opt, &val_t);
   val = val_t;
   return ret;
