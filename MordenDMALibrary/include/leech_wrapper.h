@@ -3,6 +3,7 @@
 
 #include <chrono>
 #include <cstdint>
+#include <cstring>
 #include <functional>
 #include <map>
 #include <memory>
@@ -38,18 +39,40 @@ const int32_t DEFAULT_PAGE_BYTES = 4096;
 void HandleDeleter(VMM_HANDLE handle);
 
 VMM_HANDLE Initialize(const std::string& arguments);
-std::optional<std::vector<uint8_t>> MemReadEx(
-    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
-    const uint32_t pid, const uint64_t addr, const std::size_t bytes,
-    const uint32_t flag);
-bool MemWrite(const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
-              const uint32_t pid, const uint64_t addr,
-              std::vector<uint8_t>& data);
 
 bool ConfigGet(const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
                uint64_t, uint64_t&);
 bool ConfigSet(const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
                uint64_t, uint64_t);
+
+std::optional<std::vector<uint8_t>> MemReadPage(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, const uint64_t addr);
+
+std::optional<std::vector<uint8_t>> MemReadPage(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, const uint64_t addr);
+
+bool MemPrefetchPages(const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+                      const uint32_t pid,
+                      std::vector<uint64_t> prefetch_addresses);
+
+std::optional<uint64_t> MemVirt2Phys(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, const uint64_t addr);
+
+BOOL VMMDLL_MemSearch(_In_ VMM_HANDLE hVMM, _In_ DWORD dwPID,
+                      _Inout_ PVMMDLL_MEM_SEARCH_CONTEXT ctx,
+                      _Out_ PQWORD* ppva, _Out_ PDWORD pcva);
+
+std::optional<std::vector<uint8_t>> MemReadEx(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, const uint64_t addr, const std::size_t bytes,
+    const uint32_t flag);
+
+bool MemWrite(const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+              const uint32_t pid, const uint64_t addr,
+              std::vector<uint8_t>& data);
 
 uint32_t MemReadScatter(const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> hVMM,
                         const uint32_t dwPID, PPMEM_SCATTER ppMEMs,
@@ -57,6 +80,31 @@ uint32_t MemReadScatter(const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> hVMM,
 uint32_t MemWriteScatter(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> hVMM,
     const uint32_t dwPID, PPMEM_SCATTER ppMEMs, int32_t cpMEMs);
+
+struct MemorySearchContext {
+  std::vector<VMMDLL_MEM_SEARCH_CONTEXT_SEARCHENTRY> search_entry{3};
+  std::vector<std::vector<uint8_t>> pattern_buffer{3, {32}};
+  VMMDLL_MEM_SEARCH_CONTEXT raw_context{.dwVersion = VMMDLL_MEM_SEARCH_VERSION};
+
+  MemorySearchContext(std::vector<std::vector<uint8_t>>& targets,
+                      uint64_t min_virtual_address = 0,
+                      uint64_t read_flags = 0) {
+    search_entry.resize(targets.size());
+    raw_context.pSearch = search_entry.data();
+    for (uint32_t entry_num = 0; entry_num < targets.size(); entry_num++) {
+      search_entry.at(entry_num).cb = targets.at(entry_num).size();
+
+      std::memcpy(search_entry.at(entry_num).pb,
+                  pattern_buffer.at(entry_num).data(),
+                  pattern_buffer.at(entry_num).size());
+
+      search_entry.at(entry_num).cbAlign = 0x1000;
+    }
+
+    raw_context.vaMin = min_virtual_address;
+    raw_context.ReadFlags = read_flags;
+  };
+};
 
 struct ScatterRequestPackage {
   MEM_SCATTER scatter{

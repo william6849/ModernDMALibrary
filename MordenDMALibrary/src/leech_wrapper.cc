@@ -77,6 +77,40 @@ bool ConfigSet(const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
   return VMMDLL_ConfigSet(handle->get(), opt, val);
 }
 
+std::optional<std::vector<uint8_t>> MemReadPage(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, const uint64_t addr) {
+  std::vector<uint8_t> out_buffer(4096);
+  auto result = VMMDLL_MemReadPage(handle->get(), static_cast<DWORD>(pid),
+                                   static_cast<ULONG64>(addr),
+                                   static_cast<PBYTE>(out_buffer.data()));
+  if (!result) {
+    return {};
+  }
+  return std::move(out_buffer);
+}
+
+bool MemPrefetchPages(const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+                      const uint32_t pid,
+                      std::vector<uint64_t> prefetch_addresses) {
+  return VMMDLL_MemPrefetchPages(
+      handle->get(), static_cast<DWORD>(pid),
+      reinterpret_cast<PULONG64>(prefetch_addresses.data()),
+      prefetch_addresses.size());
+}
+
+std::optional<uint64_t> MemVirt2Phys(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, const uint64_t addr) {
+  ULONG64 result = 0;
+  auto ret = VMMDLL_MemVirt2Phys(handle->get(), static_cast<DWORD>(pid),
+                                 static_cast<ULONG64>(addr), &result);
+  if (!ret) {
+    return {};
+  }
+  return result;
+}
+
 uint32_t MemReadScatter(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
     const uint32_t pid, PPMEM_SCATTER ppmems, int32_t cpmems, int32_t flags) {
