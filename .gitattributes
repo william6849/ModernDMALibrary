@@ -1,0 +1,2 @@
+cmake/code-coverage.cmake linguist-vendored
+submodules/** linguist-vendored
