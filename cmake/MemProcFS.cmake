@@ -18,15 +18,15 @@ else()
   endif()
 endif()
 
-string(REGEX MATCH "\"browser_download_url\": \"([^\"]*${OS_TYPE}[^\"]*)\"" _
-             "${RELEASE_JSON}")
+string(REGEX MATCH "\"browser_download_url\": \"([^\"]*MemProcFS_files[^\"]*${OS_TYPE}[^\"]*)\"" _
+  "${RELEASE_JSON}")
 set(RELEASE_URL ${CMAKE_MATCH_1})
 string(REGEX MATCH "(v[0-9]+\.[0-9]+\.[0-9]+)" RELEASE_VERSION "${RELEASE_URL}")
 string(REGEX MATCH "-([0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9])." _
-             "${RELEASE_URL}")
+  "${RELEASE_URL}")
 set(RELEASE_DATE ${CMAKE_MATCH_1})
 message("Fetch Latest MemProcFS Release: " ${RELEASE_VERSION} " LastUpdate: "
-        ${RELEASE_DATE})
+  ${RELEASE_DATE})
 message(VERBOSE "Target Release: " ${RELEASE_URL})
 
 ExternalProject_Add(
@@ -41,23 +41,24 @@ set(MEMPROCFS_RESOURCE_DIR ${SOURCE_DIR})
 set_target_properties(
   MemProcFS
   PROPERTIES BUILD_RPATH "."
-             INSTALL_RPATH "."
-             INSTALL_RPATH_USE_LINK_PATH TRUE)
+  INSTALL_RPATH "."
+  INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 add_library(memprocfslib SHARED IMPORTED GLOBAL)
 add_dependencies(memprocfslib MemProcFS)
 set_property(TARGET memprocfslib PROPERTY IMPORTED_IMPLIB
-                                          ${MEMPROCFS_RESOURCE_DIR}/vmm.lib)
+  ${MEMPROCFS_RESOURCE_DIR}/vmm.lib)
 set_property(
   TARGET memprocfslib
   PROPERTY IMPORTED_LOCATION
-           ${MEMPROCFS_RESOURCE_DIR}/vmm${CMAKE_SHARED_LIBRARY_SUFFIX})
+  ${MEMPROCFS_RESOURCE_DIR}/vmm${CMAKE_SHARED_LIBRARY_SUFFIX})
+
 if(WIN32)
   add_custom_command(
     TARGET MemProcFS
     POST_BUILD
     COMMAND
-      ${CMAKE_COMMAND} -E copy_if_different
-      ${CMAKE_BINARY_DIR}/third_party/Source/MemProcFs/vmm.dll
-      ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/vmm.dll)
+    ${CMAKE_COMMAND} -E copy_if_different
+    ${CMAKE_BINARY_DIR}/third_party/Source/MemProcFs/vmm.dll
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/vmm.dll)
 endif()
