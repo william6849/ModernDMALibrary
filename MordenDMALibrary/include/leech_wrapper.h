@@ -8,6 +8,7 @@
 #include <map>
 #include <memory>
 #include <optional>
+#include <stdexcept>
 #include <vector>
 
 #include "vmmdll.h"
@@ -61,10 +62,6 @@ std::optional<uint64_t> MemVirt2Phys(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
     const uint32_t pid, const uint64_t addr);
 
-BOOL VMMDLL_MemSearch(_In_ VMM_HANDLE hVMM, _In_ DWORD dwPID,
-                      _Inout_ PVMMDLL_MEM_SEARCH_CONTEXT ctx,
-                      _Out_ PQWORD* ppva, _Out_ PDWORD pcva);
-
 std::optional<std::vector<uint8_t>> MemReadEx(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
     const uint32_t pid, const uint64_t addr, const std::size_t bytes,
@@ -83,12 +80,25 @@ uint32_t MemWriteScatter(
 
 struct MemorySearchContext {
   std::vector<VMMDLL_MEM_SEARCH_CONTEXT_SEARCHENTRY> search_entry{3};
-  std::vector<std::vector<uint8_t>> pattern_buffer{3, {32}};
-  VMMDLL_MEM_SEARCH_CONTEXT raw_context{.dwVersion = VMMDLL_MEM_SEARCH_VERSION};
+  std::vector<std::vector<uint8_t>> pattern_buffer{
+      3, {VMMDLL_MEM_SEARCH_MAXLENGTH}};
+  VMMDLL_MEM_SEARCH_CONTEXT raw_context{.dwVersion = VMMDLL_MEM_SEARCH_VERSION,
+                                        .cMaxResult = 0x10000,
+                                        .vaMax = 0};
 
-  MemorySearchContext(std::vector<std::vector<uint8_t>>& targets,
+  MemorySearchContext(const std::vector<std::vector<uint8_t>>& targets,
+                      const std::vector<std::vector<uint8_t>>& masks,
                       uint64_t min_virtual_address = 0,
-                      uint64_t read_flags = 0) {
+                      uint64_t read_flags = VMMDLL_FLAG_NOCACHE,
+                      uint64_t allignment = DEFAULT_PAGE_BYTES) {
+    if (targets.empty() || masks.empty() ||
+        (targets.at(0).size() != masks.at(0).size())) {
+      throw std::runtime_error("Empty bytes");
+    }
+    if (targets.at(0).size() > VMMDLL_MEM_SEARCH_MAXLENGTH) {
+      throw std::runtime_error("Search length exceed");
+    }
+
     search_entry.resize(targets.size());
     raw_context.pSearch = search_entry.data();
     for (uint32_t entry_num = 0; entry_num < targets.size(); entry_num++) {
@@ -98,13 +108,17 @@ struct MemorySearchContext {
                   pattern_buffer.at(entry_num).data(),
                   pattern_buffer.at(entry_num).size());
 
-      search_entry.at(entry_num).cbAlign = 0x1000;
+      search_entry.at(entry_num).cbAlign = allignment;
     }
 
     raw_context.vaMin = min_virtual_address;
     raw_context.ReadFlags = read_flags;
   };
 };
+
+std::optional<std::vector<std::vector<uint64_t>>> MemSearch(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, const std::shared_ptr<MemorySearchContext> context);
 
 struct ScatterRequestPackage {
   MEM_SCATTER scatter{

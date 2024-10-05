@@ -13,6 +13,7 @@ void HandleDeleter(HANDLE handle) {
   }
 }
 }  // namespace LC
+
 namespace VMM {
 void HandleDeleter(VMM_HANDLE handle) {
   if (handle) {
@@ -80,7 +81,7 @@ bool ConfigSet(const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
 std::optional<std::vector<uint8_t>> MemReadPage(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
     const uint32_t pid, const uint64_t addr) {
-  std::vector<uint8_t> out_buffer(4096);
+  std::vector<uint8_t> out_buffer(DEFAULT_PAGE_BYTES);
   auto result = VMMDLL_MemReadPage(handle->get(), static_cast<DWORD>(pid),
                                    static_cast<ULONG64>(addr),
                                    static_cast<PBYTE>(out_buffer.data()));
@@ -93,10 +94,10 @@ std::optional<std::vector<uint8_t>> MemReadPage(
 bool MemPrefetchPages(const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
                       const uint32_t pid,
                       std::vector<uint64_t> prefetch_addresses) {
-  return VMMDLL_MemPrefetchPages(
-      handle->get(), static_cast<DWORD>(pid),
-      reinterpret_cast<PULONG64>(prefetch_addresses.data()),
-      prefetch_addresses.size());
+  std::vector<unsigned long long> vec_ull(prefetch_addresses.begin(),
+                                          prefetch_addresses.end());
+  return VMMDLL_MemPrefetchPages(handle->get(), static_cast<DWORD>(pid),
+                                 vec_ull.data(), vec_ull.size());
 }
 
 std::optional<uint64_t> MemVirt2Phys(
@@ -108,6 +109,21 @@ std::optional<uint64_t> MemVirt2Phys(
   if (!ret) {
     return {};
   }
+  return result;
+}
+
+std::optional<std::vector<std::vector<uint64_t>>> MemSearch(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, const std::shared_ptr<MemorySearchContext> context) {
+  DWORD search_result_count = 0;
+  PQWORD search_result_ptr = nullptr;
+  auto ret = VMMDLL_MemSearch(handle->get(), static_cast<DWORD>(pid),
+                              &context->raw_context, &search_result_ptr,
+                              &search_result_count);
+  if (!ret) {
+    return {};
+  }
+  std::vector<std::vector<uint64_t>> result;
   return result;
 }
 
