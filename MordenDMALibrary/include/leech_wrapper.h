@@ -9,6 +9,7 @@
 #include <memory>
 #include <optional>
 #include <stdexcept>
+#include <unordered_set>
 #include <vector>
 
 #include "vmmdll.h"
@@ -155,6 +156,38 @@ class Scatter {
   uint32_t flags_;
   std::chrono::system_clock::time_point last_execution_;
 };
+
+struct PROCESS_INFORMATION {
+  uint64_t magic;
+  uint16_t version;
+  uint16_t size;
+  VMMDLL_MEMORYMODEL_TP memory_model;
+  VMMDLL_SYSTEM_TP system;
+  bool user_only;
+  uint32_t pid;
+  uint32_t parent_pid;
+  uint32_t state;
+  std::array<int8_t, 16> process_name;
+  std::array<int8_t, 64> long_process_name;
+  uint64_t directory_table_base;
+  uint64_t directory_table_base_user_optional;  // may not exist
+  struct {
+    uint64_t eprocess;
+    uint64_t process_environment_block;
+    uint64_t reserved_1;
+    bool is_wow64;
+    uint32_t process_environment_block_32;  // WoW64 only
+    uint32_t session_id;
+    uint64_t luid;
+    std::array<int8_t, MAX_PATH> sid;
+    VMMDLL_PROCESS_INTEGRITY_LEVEL integrity_level;
+  } win;
+
+  std::unordered_set<uint32_t> child_process_pid_list;
+};
+
+auto ProcessGetInformationAll(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle);
 };  // namespace VMM
 
 #endif

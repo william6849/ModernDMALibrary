@@ -197,4 +197,75 @@ bool Scatter::ExecuteWrite() { return false; }
 
 void Scatter::SetPID(uint32_t pid) { pid_ = pid; }
 void Scatter::SetFlags(uint32_t flags) { flags_ = flags; }
+
+auto ProcessGetInformationAll(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle) {
+  DWORD information_counts = 0;
+  PVMMDLL_PROCESS_INFORMATION information_list = nullptr;
+  printf("CALL:    VMMDLL_ProcessGetInformationAll\n");
+  auto result = VMMDLL_ProcessGetInformationAll(
+      handle->get(), &information_list, &information_counts);
+  std::map<int32_t, PROCESS_INFORMATION> process_information_map;
+  if (result) {
+    for (int working_item = 0; working_item < information_counts;
+         working_item++) {
+      auto entry = &information_list[working_item];
+
+      PROCESS_INFORMATION information{
+          .magic = entry->magic,
+          .version = entry->wVersion,
+          .size = entry->wSize,
+          .memory_model = entry->tpMemoryModel,
+          .system = entry->tpSystem,
+          .user_only = static_cast<bool>(entry->fUserOnly),
+          .pid = entry->dwPID,
+          .parent_pid = entry->dwPPID,
+          .state = entry->dwState,
+          .directory_table_base = entry->paDTB,
+          .directory_table_base_user_optional = entry->paDTB_UserOpt,
+          .win = {.eprocess = entry->win.vaEPROCESS,
+                  .process_environment_block = entry->win.vaPEB,
+                  .reserved_1 = entry->win._Reserved1,
+                  .is_wow64 = static_cast<bool>(entry->win.fWow64),
+                  .process_environment_block_32 = entry->win.vaPEB32,
+                  .session_id = entry->win.dwSessionId,
+                  .luid = entry->win.qwLUID,
+                  .integrity_level = entry->win.IntegrityLevel}};
+
+      std::copy(entry->szName,
+                entry->szName + std::min(information.process_name.size() - 1,
+                                         strlen(entry->szName)),
+                information.process_name.begin());
+      information.process_name[std::min(information.process_name.size() - 1,
+                                        strlen(entry->szName))] = '\0';
+      std::copy(
+          entry->szNameLong,
+          entry->szNameLong + std::min(information.long_process_name.size() - 1,
+                                       strlen(entry->szNameLong)),
+          information.long_process_name.begin());
+      information
+          .long_process_name[std::min(information.long_process_name.size() - 1,
+                                      strlen(entry->szNameLong))] = '\0';
+      std::copy(entry->win.szSID,
+                entry->win.szSID + std::min(information.win.sid.size() - 1,
+                                            strlen(entry->win.szSID)),
+                information.win.sid.begin());
+      information.win.sid[std::min(information.win.sid.size() - 1,
+                                   strlen(entry->win.szSID))] = '\0';
+
+      if (process_information_map.contains(entry->dwPID)) {
+        information.child_process_pid_list = std::move(
+            process_information_map.at(entry->dwPID).child_process_pid_list);
+      }
+
+      process_information_map[entry->dwPID] = std::move(information);
+
+      process_information_map.at(entry->dwPPID)
+          .child_process_pid_list.insert(entry->dwPID);
+    }
+    VMMDLL_MemFree(information_list);
+  }
+  return process_information_map;
+}
+
 }  // namespace VMM
