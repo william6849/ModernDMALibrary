@@ -118,7 +118,7 @@ struct MemorySearchContext {
   };
 };
 
-std::optional<std::vector<std::vector<uint64_t>>> MemSearch(
+std::vector<uint64_t> MemSearch(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
     const uint32_t pid, const std::shared_ptr<MemorySearchContext> context);
 

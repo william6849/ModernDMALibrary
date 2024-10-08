@@ -112,7 +112,7 @@ std::optional<uint64_t> MemVirt2Phys(
   return result;
 }
 
-std::optional<std::vector<std::vector<uint64_t>>> MemSearch(
+std::vector<uint64_t> MemSearch(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
     const uint32_t pid, const std::shared_ptr<MemorySearchContext> context) {
   DWORD search_result_count = 0;
@@ -120,10 +120,14 @@ std::optional<std::vector<std::vector<uint64_t>>> MemSearch(
   auto ret = VMMDLL_MemSearch(handle->get(), static_cast<DWORD>(pid),
                               &context->raw_context, &search_result_ptr,
                               &search_result_count);
-  if (!ret) {
-    return {};
+
+  std::vector<uint64_t> result;
+  if (ret) {
+    for (auto entry = 0; entry < search_result_count; entry++) {
+      result.push_back(search_result_ptr[entry]);
+    }
+    VMMDLL_MemFree(search_result_ptr);
   }
-  std::vector<std::vector<uint64_t>> result;
   return result;
 }
 
