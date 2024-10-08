@@ -72,12 +72,13 @@ bool MemWrite(const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
               const uint32_t pid, const uint64_t addr,
               std::vector<uint8_t>& data);
 
-uint32_t MemReadScatter(const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> hVMM,
-                        const uint32_t dwPID, PPMEM_SCATTER ppMEMs,
-                        int32_t cpMEMs, int32_t flags);
+uint32_t MemReadScatter(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, PPMEM_SCATTER scatter_list, int32_t scatter_size,
+    int32_t flags);
 uint32_t MemWriteScatter(
-    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> hVMM,
-    const uint32_t dwPID, PPMEM_SCATTER ppMEMs, int32_t cpMEMs);
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, PPMEM_SCATTER scatter_list, int32_t scatter_size);
 
 struct MemorySearchContext {
   std::vector<VMMDLL_MEM_SEARCH_CONTEXT_SEARCHENTRY> search_entry{3};

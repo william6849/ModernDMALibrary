@@ -129,14 +129,16 @@ std::optional<std::vector<std::vector<uint64_t>>> MemSearch(
 
 uint32_t MemReadScatter(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
-    const uint32_t pid, PPMEM_SCATTER ppmems, int32_t cpmems, int32_t flags) {
-  return VMMDLL_MemReadScatter(handle->get(), pid, ppmems, cpmems, flags);
+    const uint32_t pid, PPMEM_SCATTER scatter_list, int32_t scatter_size,
+    int32_t flags) {
+  return VMMDLL_MemReadScatter(handle->get(), pid, scatter_list, scatter_size,
+                               flags);
 }
 
 uint32_t MemWriteScatter(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
-    const uint32_t pid, PPMEM_SCATTER ppmems, int32_t cpmems) {
-  return VMMDLL_MemWriteScatter(handle->get(), pid, ppmems, cpmems);
+    const uint32_t pid, PPMEM_SCATTER scatter_list, int32_t scatter_size) {
+  return VMMDLL_MemWriteScatter(handle->get(), pid, scatter_list, scatter_size);
 }
 
 Scatter::Scatter(uint32_t pid, uint32_t flags = VMMDLL_FLAG_NOCACHE |
