@@ -188,6 +188,18 @@ struct PROCESS_INFORMATION {
 
 auto ProcessGetInformationAll(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle);
+
+uint32_t PidGetFromName(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    std::string process_name);
+
+std::vector<uint32_t> PidList(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle);
+
+PROCESS_INFORMATION ProcessGetInformation(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid);
+
 };  // namespace VMM
 
 #endif

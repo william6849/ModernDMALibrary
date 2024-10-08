@@ -268,4 +268,38 @@ auto ProcessGetInformationAll(
   return process_information_map;
 }
 
+uint32_t PidGetFromName(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    std::string process_name) {
+  auto list = ProcessGetInformationAll(handle);
+  for (auto& entry : list) {
+    if (std::equal(entry.second.process_name.begin(),
+                   entry.second.process_name.begin() + process_name.size(),
+                   process_name.begin())) {
+      return entry.first;
+    }
+  }
+  return 0;
+}
+
+std::vector<uint32_t> PidList(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle) {
+  std::vector<uint32_t> ret_pid_list;
+  PDWORD pid_list;
+  SIZE_T pid_number;
+  if (VMMDLL_PidList(handle->get(), pid_list, &pid_number)) {
+    for (auto count = 0; count < pid_number; count++) {
+      ret_pid_list.push_back(pid_list[count]);
+    }
+    VMMDLL_MemFree(pid_list);
+  }
+  return ret_pid_list;
+}
+
+PROCESS_INFORMATION ProcessGetInformation(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid) {
+  return ProcessGetInformationAll(handle).at(pid);
+}
+
 }  // namespace VMM
