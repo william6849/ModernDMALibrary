@@ -201,6 +201,16 @@ PROCESS_INFORMATION ProcessGetInformation(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
     const uint32_t pid);
 
+namespace PE {
+std::vector<_IMAGE_DATA_DIRECTORY> ProcessGetDirectories(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, const std::string& module_name);
+
+std::vector<_IMAGE_SECTION_HEADER> ProcessGetSections(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, const std::string& module_name);
+}  // namespace PE
+
 };  // namespace VMM
 
 #endif

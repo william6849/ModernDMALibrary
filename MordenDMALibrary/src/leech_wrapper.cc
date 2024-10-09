@@ -2,6 +2,7 @@
 
 #include <optional>
 #include <sstream>
+#include <stdexcept>
 
 #include "spdlog/spdlog.h"
 
@@ -307,5 +308,32 @@ PROCESS_INFORMATION ProcessGetInformation(
     const uint32_t pid) {
   return ProcessGetInformationAll(handle).at(pid);
 }
+namespace PE {
+std::vector<_IMAGE_DATA_DIRECTORY> ProcessGetDirectories(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, const std::string& module_name) {
+  std::vector<_IMAGE_DATA_DIRECTORY> result(16);
+  if (VMMDLL_ProcessGetDirectoriesU(handle->get(), pid, module_name.c_str(),
+                                    result.data())) {
+    return result;
+  }
+  throw std::runtime_error("ProcessGetInformation");
+}
 
+std::vector<_IMAGE_SECTION_HEADER> ProcessGetSections(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, const std::string& module_name) {
+  std::vector<_IMAGE_SECTION_HEADER> result;
+  DWORD sections = 0;
+  if (VMMDLL_ProcessGetSectionsU(handle->get(), pid, module_name.c_str(), NULL,
+                                 0, &sections)) {
+    result.resize(sections);
+    if (!VMMDLL_ProcessGetSectionsU(handle->get(), pid, module_name.c_str(),
+                                    result.data(), sections, &sections)) {
+      throw std::runtime_error("ProcessGetSectionsU");
+    }
+  }
+  return result;
+}
+}  // namespace PE
 }  // namespace VMM
