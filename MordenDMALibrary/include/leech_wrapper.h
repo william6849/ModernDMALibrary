@@ -158,7 +158,7 @@ class Scatter {
   std::chrono::system_clock::time_point last_execution_;
 };
 
-struct PROCESS_INFORMATION {
+struct ProcessInformation {
   uint64_t magic;
   uint16_t version;
   uint16_t size;
@@ -197,7 +197,7 @@ uint32_t PidGetFromName(
 std::vector<uint32_t> PidList(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle);
 
-PROCESS_INFORMATION ProcessGetInformation(
+ProcessInformation ProcessGetInformation(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
     const uint32_t pid);
 
@@ -210,6 +210,42 @@ std::vector<_IMAGE_SECTION_HEADER> ProcessGetSections(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
     const uint32_t pid, const std::string& module_name);
 }  // namespace PE
+
+namespace MAP {
+struct PteEntry {
+  tdVMMDLL_MAP_PTEENTRY raw_entry;
+  std::string name = "\0";
+};
+std::vector<PteEntry> GetPte(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, const bool identify_modules);
+
+struct VadEntry {
+  tdVMMDLL_MAP_VADENTRY raw_entry;
+  std::string name = "\0";
+};
+std::vector<VadEntry> GetVad(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, const bool identify_modules);
+
+struct ModuleEntry {
+  tdVMMDLL_MAP_MODULEENTRY raw_entry;
+  std::string name = "\0";
+  std::string full_name = "\0";
+};
+std::vector<ModuleEntry> GetModule(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, uint32_t flags);
+
+struct UnloadModuleEntry {
+  tdVMMDLL_MAP_UNLOADEDMODULEENTRY raw_entry;
+  std::string name = "\0";
+};
+std::vector<UnloadModuleEntry> GetUnloadedModule(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid);
+
+}  // namespace MAP
 
 };  // namespace VMM
 

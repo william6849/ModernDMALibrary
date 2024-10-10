@@ -212,13 +212,13 @@ auto ProcessGetInformationAll(
   printf("CALL:    VMMDLL_ProcessGetInformationAll\n");
   auto result = VMMDLL_ProcessGetInformationAll(
       handle->get(), &information_list, &information_counts);
-  std::map<int32_t, PROCESS_INFORMATION> process_information_map;
+  std::map<int32_t, ProcessInformation> process_information_map;
   if (result) {
     for (int working_item = 0; working_item < information_counts;
          working_item++) {
       auto entry = &information_list[working_item];
 
-      PROCESS_INFORMATION information{
+      ProcessInformation information{
           .magic = entry->magic,
           .version = entry->wVersion,
           .size = entry->wSize,
@@ -303,7 +303,7 @@ std::vector<uint32_t> PidList(
   return ret_pid_list;
 }
 
-PROCESS_INFORMATION ProcessGetInformation(
+ProcessInformation ProcessGetInformation(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
     const uint32_t pid) {
   return ProcessGetInformationAll(handle).at(pid);
@@ -336,4 +336,106 @@ std::vector<_IMAGE_SECTION_HEADER> ProcessGetSections(
   return result;
 }
 }  // namespace PE
+
+namespace MAP {
+std::vector<PteEntry> GetPte(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, const bool identify_modules) {
+  PVMMDLL_MAP_PTE pte_maps = nullptr;
+  std::vector<PteEntry> result;
+  auto ret =
+      VMMDLL_Map_GetPteU(handle->get(), pid, identify_modules, &pte_maps);
+  if (ret) {
+    if (pte_maps->dwVersion != VMMDLL_MAP_PTE_VERSION) {
+      VMMDLL_MemFree(pte_maps);
+      throw std::runtime_error("GetPte");
+    }
+    result.resize(pte_maps->cMap);
+    for (auto entry_count = 0; entry_count < pte_maps->cMap; entry_count++) {
+      auto ret = pte_maps->pMap[entry_count];
+      PteEntry entry = {.raw_entry = ret, .name = ret.uszText};
+      entry.raw_entry.uszText = &entry.name.at(0);
+      result.push_back(entry);
+    }
+    VMMDLL_MemFree(pte_maps);
+  }
+  return result;
+}
+
+std::vector<VadEntry> GetVad(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, const bool identify_modules) {
+  PVMMDLL_MAP_VAD vad_maps = nullptr;
+  std::vector<VadEntry> result;
+  auto ret =
+      VMMDLL_Map_GetVadU(handle->get(), pid, identify_modules, &vad_maps);
+  if (ret) {
+    if (vad_maps->dwVersion != VMMDLL_MAP_VAD_VERSION) {
+      VMMDLL_MemFree(vad_maps);
+      throw std::runtime_error("GetVad");
+    }
+    result.resize(vad_maps->cMap);
+    for (auto entry_count = 0; entry_count < vad_maps->cMap; entry_count++) {
+      auto ret = vad_maps->pMap[entry_count];
+      VadEntry entry = {.raw_entry = ret, .name = ret.uszText};
+      entry.raw_entry.uszText = &entry.name.at(0);
+      result.push_back(entry);
+    }
+    VMMDLL_MemFree(vad_maps);
+  }
+  return result;
+}
+
+std::vector<ModuleEntry> GetModule(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, uint32_t flags) {
+  PVMMDLL_MAP_MODULE module_maps = nullptr;
+  std::vector<ModuleEntry> result;
+  auto ret = VMMDLL_Map_GetModuleU(handle->get(), pid, &module_maps, flags);
+  if (ret) {
+    if (module_maps->dwVersion != VMMDLL_MAP_MODULE_VERSION) {
+      VMMDLL_MemFree(module_maps);
+      throw std::runtime_error("GetModule");
+    }
+    result.resize(module_maps->cMap);
+    for (auto entry_count = 0; entry_count < module_maps->cMap; entry_count++) {
+      auto ret = module_maps->pMap[entry_count];
+      ModuleEntry entry = {
+          .raw_entry = ret, .name = ret.uszText, .full_name = ret.uszFullName};
+      entry.raw_entry.uszText = &entry.name.at(0);
+      entry.raw_entry.uszFullName = &entry.full_name.at(0);
+      result.push_back(entry);
+    }
+    VMMDLL_MemFree(module_maps);
+  }
+  return result;
+}
+
+std::vector<UnloadModuleEntry> GetUnloadedModule(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid) {
+  PVMMDLL_MAP_UNLOADEDMODULE unload_module_maps = nullptr;
+  std::vector<UnloadModuleEntry> result;
+  auto ret =
+      VMMDLL_Map_GetUnloadedModuleU(handle->get(), pid, &unload_module_maps);
+  if (ret) {
+    if (unload_module_maps->dwVersion != VMMDLL_MAP_UNLOADEDMODULE_VERSION) {
+      VMMDLL_MemFree(unload_module_maps);
+      throw std::runtime_error("GetUnloadedModule");
+    }
+    result.resize(unload_module_maps->cMap);
+    for (auto entry_count = 0; entry_count < unload_module_maps->cMap;
+         entry_count++) {
+      auto ret = unload_module_maps->pMap[entry_count];
+      UnloadModuleEntry entry = {.raw_entry = ret, .name = ret.uszText};
+      entry.raw_entry.uszText = &entry.name.at(0);
+      result.push_back(entry);
+    }
+    VMMDLL_MemFree(unload_module_maps);
+  }
+  return result;
+}
+
+}  // namespace MAP
+
 }  // namespace VMM
