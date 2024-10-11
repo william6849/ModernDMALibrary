@@ -48,6 +48,7 @@ add_library(memprocfslib SHARED IMPORTED GLOBAL)
 add_dependencies(memprocfslib MemProcFS)
 set_property(TARGET memprocfslib PROPERTY IMPORTED_IMPLIB
   ${MEMPROCFS_RESOURCE_DIR}/vmm.lib)
+
 set_property(
   TARGET memprocfslib
   PROPERTY IMPORTED_LOCATION

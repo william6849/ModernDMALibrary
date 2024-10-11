@@ -146,65 +146,6 @@ uint32_t MemWriteScatter(
   return VMMDLL_MemWriteScatter(handle->get(), pid, scatter_list, scatter_size);
 }
 
-Scatter::Scatter(uint32_t pid, uint32_t flags = VMMDLL_FLAG_NOCACHE |
-                                                VMMDLL_FLAG_ZEROPAD_ON_FAIL |
-                                                VMMDLL_FLAG_NOPAGING)
-    : pid_(pid), flags_(flags) {}
-
-void Scatter::AddSRP(const SRP& srp) { srp_map_[srp.address] = srp; }
-
-void Scatter::AddSRP(const std::vector<SRP>& srps) {
-  for (auto& srp : srps) {
-    AddSRP(srp);
-  }
-}
-
-void Scatter::AddSRP(int64_t address, int32_t length) {
-  SRP srp;
-  srp.address = address;
-  srp.length = length;
-  srp.scatter.qwA = address;
-  srp.scatter.cb = length;
-  srp.scatter.pb = srp.buffer.data();
-  AddSRP(srp);
-}
-
-bool Scatter::RemoveSRP(const SRP& srp) { return RemoveSRP(srp.address); }
-
-bool Scatter::RemoveSRP(int64_t address) {
-  auto it = srp_map_.find(address);
-  if (it == srp_map_.end()) {
-    return false;
-  }
-  srp_map_.erase(it);
-  return true;
-}
-
-SRP* Scatter::GetSRP(int64_t address) {
-  auto it = srp_map_.find(address);
-  if (it == srp_map_.end()) {
-    return nullptr;
-  }
-  return &(it->second);
-}
-
-std::vector<uint8_t>& Scatter::GetData(int64_t address) {
-  auto it = srp_map_.find(address);
-  if (it == srp_map_.end()) {
-    throw std::runtime_error("SRP not exist.");
-  }
-  return it->second.buffer;
-}
-
-const std::map<int64_t, SRP>& Scatter::SRPMap() noexcept { return srp_map_; }
-
-bool Scatter::ExecuteRead() { return false; }
-
-bool Scatter::ExecuteWrite() { return false; }
-
-void Scatter::SetPID(uint32_t pid) { pid_ = pid; }
-void Scatter::SetFlags(uint32_t flags) { flags_ = flags; }
-
 auto ProcessGetInformationAll(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle) {
   DWORD information_counts = 0;
@@ -291,16 +232,14 @@ uint32_t PidGetFromName(
 
 std::vector<uint32_t> PidList(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle) {
-  std::vector<uint32_t> ret_pid_list;
-  PDWORD pid_list;
-  SIZE_T pid_number;
-  if (VMMDLL_PidList(handle->get(), pid_list, &pid_number)) {
-    for (auto count = 0; count < pid_number; count++) {
-      ret_pid_list.push_back(pid_list[count]);
+  std::vector<uint32_t> pid_list;
+  SIZE_T pid_number = 0;
+  if (VMMDLL_PidList(handle->get(), nullptr, &pid_number)) {
+    pid_list.resize(pid_number);
+    if (VMMDLL_PidList(handle->get(), pid_list.data(), &pid_number)) {
     }
-    VMMDLL_MemFree(pid_list);
   }
-  return ret_pid_list;
+  return pid_list;
 }
 
 ProcessInformation ProcessGetInformation(

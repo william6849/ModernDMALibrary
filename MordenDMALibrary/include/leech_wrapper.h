@@ -1,11 +1,9 @@
 #ifndef LEECH_WRAPPER_H
 #define LEECH_WRAPPER_H
 
-#include <chrono>
 #include <cstdint>
 #include <cstring>
 #include <functional>
-#include <map>
 #include <memory>
 #include <optional>
 #include <stdexcept>
@@ -13,6 +11,8 @@
 #include <vector>
 
 #include "vmmdll.h"
+
+const int32_t DEFAULT_PAGE_BYTES = 4096;
 
 template <typename T>
 class HandleWrapper {
@@ -35,8 +35,6 @@ namespace LC {
 void HandleDeleter(HANDLE handle);
 };
 namespace VMM {
-
-const int32_t DEFAULT_PAGE_BYTES = 4096;
 
 void HandleDeleter(VMM_HANDLE handle);
 
@@ -122,42 +120,6 @@ std::vector<uint64_t> MemSearch(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
     const uint32_t pid, const std::shared_ptr<MemorySearchContext> context);
 
-struct ScatterRequestPackage {
-  MEM_SCATTER scatter{
-      .version = MEM_SCATTER_VERSION, .f = false, .cb = DEFAULT_PAGE_BYTES};
-  int64_t address;
-  int32_t length = DEFAULT_PAGE_BYTES;
-  std::vector<uint8_t> buffer;
-};
-using SRP = ScatterRequestPackage;
-
-class Scatter {
- public:
-  Scatter(uint32_t pid, uint32_t flags);
-
-  void AddSRP(const SRP& srp);
-  void AddSRP(const std::vector<SRP>& srps);
-  void AddSRP(int64_t address, int32_t length);
-  bool RemoveSRP(const SRP& srp);
-  bool RemoveSRP(int64_t address);
-  SRP* GetSRP(int64_t address);
-  std::vector<uint8_t>& GetData(int64_t address);
-
-  const std::map<int64_t, SRP>& SRPMap() noexcept;
-
-  bool ExecuteRead();
-  bool ExecuteWrite();
-
-  void SetPID(uint32_t pid);
-  void SetFlags(uint32_t flags);
-
- private:
-  std::map<int64_t, SRP> srp_map_;
-  uint32_t pid_;
-  uint32_t flags_;
-  std::chrono::system_clock::time_point last_execution_;
-};
-
 struct ProcessInformation {
   uint64_t magic;
   uint16_t version;
@@ -171,13 +133,13 @@ struct ProcessInformation {
   std::array<int8_t, 16> process_name;
   std::array<int8_t, 64> long_process_name;
   uint64_t directory_table_base;
-  uint64_t directory_table_base_user_optional;  // may not exist
+  uint64_t directory_table_base_user_optional;
   struct {
     uint64_t eprocess;
     uint64_t process_environment_block;
     uint64_t reserved_1;
     bool is_wow64;
-    uint32_t process_environment_block_32;  // WoW64 only
+    uint32_t process_environment_block_32;
     uint32_t session_id;
     uint64_t luid;
     std::array<int8_t, MAX_PATH> sid;
