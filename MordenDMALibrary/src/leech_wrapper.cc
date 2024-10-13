@@ -375,6 +375,59 @@ std::vector<UnloadModuleEntry> GetUnloadedModule(
   return result;
 }
 
+std::vector<EatEntry> GetEAT(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, std::string module_name) {
+  PVMMDLL_MAP_EAT eat_maps = nullptr;
+  std::vector<EatEntry> result;
+  auto ret =
+      VMMDLL_Map_GetEATU(handle->get(), pid, module_name.data(), &eat_maps);
+  if (ret) {
+    if (eat_maps->dwVersion != VMMDLL_MAP_EAT_VERSION) {
+      VMMDLL_MemFree(eat_maps);
+      throw std::runtime_error("GetEAT");
+    }
+    result.resize(eat_maps->cMap);
+    for (auto entry_count = 0; entry_count < eat_maps->cMap; entry_count++) {
+      auto ret = eat_maps->pMap[entry_count];
+      EatEntry entry = {.raw_entry = ret,
+                        .function = ret.uszFunction,
+                        .forward_function = ret.uszForwardedFunction};
+      entry.raw_entry.uszFunction = &entry.function.at(0);
+      entry.raw_entry.uszForwardedFunction = &entry.forward_function.at(0);
+      result.push_back(entry);
+    }
+    VMMDLL_MemFree(eat_maps);
+  }
+  return result;
+}
+
+std::vector<IatEntry> GetIAT(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, std::string module_name) {
+  PVMMDLL_MAP_IAT iat_maps = nullptr;
+  std::vector<IatEntry> result;
+  auto ret =
+      VMMDLL_Map_GetIATU(handle->get(), pid, module_name.data(), &iat_maps);
+  if (ret) {
+    if (iat_maps->dwVersion != VMMDLL_MAP_IAT_VERSION) {
+      VMMDLL_MemFree(iat_maps);
+      throw std::runtime_error("GetEAT");
+    }
+    result.resize(iat_maps->cMap);
+    for (auto entry_count = 0; entry_count < iat_maps->cMap; entry_count++) {
+      auto ret = iat_maps->pMap[entry_count];
+      IatEntry entry = {.raw_entry = ret,
+                        .function = ret.uszFunction,
+                        .module = ret.uszModule};
+      entry.raw_entry.uszFunction = &entry.function.at(0);
+      entry.raw_entry.uszModule = &entry.module.at(0);
+      result.push_back(entry);
+    }
+    VMMDLL_MemFree(iat_maps);
+  }
+  return result;
+}
 }  // namespace MAP
 
 }  // namespace VMM

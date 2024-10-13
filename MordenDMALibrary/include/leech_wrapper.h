@@ -207,6 +207,24 @@ std::vector<UnloadModuleEntry> GetUnloadedModule(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
     const uint32_t pid);
 
+struct EatEntry {
+  tdVMMDLL_MAP_EATENTRY raw_entry;
+  std::string function = "\0";
+  std::string forward_function = "\0";
+};
+std::vector<EatEntry> GetEAT(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, std::string module_name);
+
+struct IatEntry {
+  tdVMMDLL_MAP_IATENTRY raw_entry;
+  std::string function = "\0";
+  std::string module = "\0";
+};
+std::vector<IatEntry> GetIAT(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, std::string module_name);
+
 }  // namespace MAP
 
 };  // namespace VMM
