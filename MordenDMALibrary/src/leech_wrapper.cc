@@ -1,5 +1,6 @@
 #include "leech_wrapper.h"
 
+#include <algorithm>
 #include <optional>
 #include <sstream>
 #include <stdexcept>
@@ -264,8 +265,8 @@ std::vector<_IMAGE_SECTION_HEADER> ProcessGetSections(
     const uint32_t pid, const std::string& module_name) {
   std::vector<_IMAGE_SECTION_HEADER> result;
   DWORD sections = 0;
-  if (VMMDLL_ProcessGetSectionsU(handle->get(), pid, module_name.c_str(), NULL,
-                                 0, &sections)) {
+  if (VMMDLL_ProcessGetSectionsU(handle->get(), pid, module_name.c_str(),
+                                 nullptr, 0, &sections)) {
     result.resize(sections);
     if (!VMMDLL_ProcessGetSectionsU(handle->get(), pid, module_name.c_str(),
                                     result.data(), sections, &sections)) {
