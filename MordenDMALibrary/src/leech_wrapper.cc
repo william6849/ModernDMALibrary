@@ -288,7 +288,7 @@ std::vector<PteEntry> GetPte(
   if (ret) {
     if (pte_maps->dwVersion != VMMDLL_MAP_PTE_VERSION) {
       VMMDLL_MemFree(pte_maps);
-      throw std::runtime_error("GetPte");
+      throw std::runtime_error("GetPte version mismatched");
     }
     result.resize(pte_maps->cMap);
     for (auto entry_count = 0; entry_count < pte_maps->cMap; entry_count++) {
@@ -312,7 +312,7 @@ std::vector<VadEntry> GetVad(
   if (ret) {
     if (vad_maps->dwVersion != VMMDLL_MAP_VAD_VERSION) {
       VMMDLL_MemFree(vad_maps);
-      throw std::runtime_error("GetVad");
+      throw std::runtime_error("GetVad version mismatched");
     }
     result.resize(vad_maps->cMap);
     for (auto entry_count = 0; entry_count < vad_maps->cMap; entry_count++) {
@@ -326,16 +326,39 @@ std::vector<VadEntry> GetVad(
   return result;
 }
 
+std::vector<VadExEntry> GetVadEx(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, const uint32_t start_page, const uint32_t pages) {
+  PVMMDLL_MAP_VADEX vadex_maps = nullptr;
+  std::vector<VadExEntry> result;
+  auto ret =
+      VMMDLL_Map_GetVadEx(handle->get(), pid, start_page, pages, &vadex_maps);
+  if (ret) {
+    if (vadex_maps->dwVersion != VMMDLL_MAP_VADEX_VERSION) {
+      VMMDLL_MemFree(vadex_maps);
+      throw std::runtime_error("GetVadEx version mismatched");
+    }
+    result.resize(vadex_maps->cMap);
+    for (auto entry_count = 0; entry_count < vadex_maps->cMap; entry_count++) {
+      auto ret = vadex_maps->pMap[entry_count];
+      VadExEntry entry = {.raw_entry = ret};
+      result.push_back(entry);
+    }
+    VMMDLL_MemFree(vadex_maps);
+  }
+  return result;
+}
+
 std::vector<ModuleEntry> GetModule(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
-    const uint32_t pid, uint32_t flags) {
+    const uint32_t pid, const uint32_t flags) {
   PVMMDLL_MAP_MODULE module_maps = nullptr;
   std::vector<ModuleEntry> result;
   auto ret = VMMDLL_Map_GetModuleU(handle->get(), pid, &module_maps, flags);
   if (ret) {
     if (module_maps->dwVersion != VMMDLL_MAP_MODULE_VERSION) {
       VMMDLL_MemFree(module_maps);
-      throw std::runtime_error("GetModule");
+      throw std::runtime_error("GetModule version mismatched");
     }
     result.resize(module_maps->cMap);
     for (auto entry_count = 0; entry_count < module_maps->cMap; entry_count++) {
@@ -351,6 +374,18 @@ std::vector<ModuleEntry> GetModule(
   return result;
 }
 
+std::optional<ModuleEntry> GetModule(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, const uint32_t flags, const std::string& module_name) {
+  auto map = GetModule(handle, pid, flags);
+  for (auto& entry : map) {
+    if (entry.name == module_name || entry.full_name == module_name) {
+      return entry;
+    }
+  }
+  return {};
+}
+
 std::vector<UnloadModuleEntry> GetUnloadedModule(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
     const uint32_t pid) {
@@ -361,7 +396,7 @@ std::vector<UnloadModuleEntry> GetUnloadedModule(
   if (ret) {
     if (unload_module_maps->dwVersion != VMMDLL_MAP_UNLOADEDMODULE_VERSION) {
       VMMDLL_MemFree(unload_module_maps);
-      throw std::runtime_error("GetUnloadedModule");
+      throw std::runtime_error("GetUnloadedModule version mismatched");
     }
     result.resize(unload_module_maps->cMap);
     for (auto entry_count = 0; entry_count < unload_module_maps->cMap;
@@ -386,7 +421,7 @@ std::vector<EatEntry> GetEAT(
   if (ret) {
     if (eat_maps->dwVersion != VMMDLL_MAP_EAT_VERSION) {
       VMMDLL_MemFree(eat_maps);
-      throw std::runtime_error("GetEAT");
+      throw std::runtime_error("GetEat version mismatched");
     }
     result.resize(eat_maps->cMap);
     for (auto entry_count = 0; entry_count < eat_maps->cMap; entry_count++) {
@@ -413,7 +448,7 @@ std::vector<IatEntry> GetIAT(
   if (ret) {
     if (iat_maps->dwVersion != VMMDLL_MAP_IAT_VERSION) {
       VMMDLL_MemFree(iat_maps);
-      throw std::runtime_error("GetEAT");
+      throw std::runtime_error("GetIat version mismatched");
     }
     result.resize(iat_maps->cMap);
     for (auto entry_count = 0; entry_count < iat_maps->cMap; entry_count++) {
@@ -429,6 +464,100 @@ std::vector<IatEntry> GetIAT(
   }
   return result;
 }
+
+std::vector<HeapEntry> GetHeap(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid) {
+  PVMMDLL_MAP_HEAP heap_maps = nullptr;
+  std::vector<HeapEntry> result;
+  auto ret = VMMDLL_Map_GetHeap(handle->get(), pid, &heap_maps);
+  if (ret) {
+    if (heap_maps->dwVersion != VMMDLL_MAP_HEAP_VERSION) {
+      VMMDLL_MemFree(heap_maps);
+      throw std::runtime_error("GetHeap version mismatched");
+    }
+    result.resize(heap_maps->cMap);
+    for (auto entry_count = 0; entry_count < heap_maps->cMap; entry_count++) {
+      auto ret = heap_maps->pMap[entry_count];
+      HeapEntry entry = {.raw_entry = ret};
+      result.push_back(entry);
+    }
+    VMMDLL_MemFree(heap_maps);
+  }
+  return result;
+}
+
+std::vector<HeapAllocEntry> GetHeapAlloc(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, const uint64_t heap_number_or_address) {
+  PVMMDLL_MAP_HEAPALLOC heap_alloc_maps = nullptr;
+  std::vector<HeapAllocEntry> result;
+  auto ret = VMMDLL_Map_GetHeapAlloc(handle->get(), pid, heap_number_or_address,
+                                     &heap_alloc_maps);
+  if (ret) {
+    if (heap_alloc_maps->dwVersion != VMMDLL_MAP_HEAPALLOC_VERSION) {
+      VMMDLL_MemFree(heap_alloc_maps);
+      throw std::runtime_error("GetHeapAlloc version dismatch");
+    }
+    result.resize(heap_alloc_maps->cMap);
+    for (auto entry_count = 0; entry_count < heap_alloc_maps->cMap;
+         entry_count++) {
+      auto ret = heap_alloc_maps->pMap[entry_count];
+      HeapAllocEntry entry = {.raw_entry = ret};
+      result.push_back(entry);
+    }
+    VMMDLL_MemFree(heap_alloc_maps);
+  }
+  return result;
+}
+
+std::vector<ThreadEntry> GetThread(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid) {
+  PVMMDLL_MAP_THREAD thread_maps = nullptr;
+  std::vector<ThreadEntry> result;
+  auto ret = VMMDLL_Map_GetThread(handle->get(), pid, &thread_maps);
+  if (ret) {
+    if (thread_maps->dwVersion != VMMDLL_MAP_THREAD_VERSION) {
+      VMMDLL_MemFree(thread_maps);
+      throw std::runtime_error("GetThread version mismatched");
+    }
+    result.resize(thread_maps->cMap);
+    for (auto entry_count = 0; entry_count < thread_maps->cMap; entry_count++) {
+      auto ret = thread_maps->pMap[entry_count];
+      ThreadEntry entry = {.raw_entry = ret};
+      result.push_back(entry);
+    }
+    VMMDLL_MemFree(thread_maps);
+  }
+  return result;
+}
+
+std::vector<HandleEntry> GetHandle(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid) {
+  PVMMDLL_MAP_HANDLE handle_maps = nullptr;
+  std::vector<HandleEntry> result;
+  auto ret = VMMDLL_Map_GetHandleU(handle->get(), pid, &handle_maps);
+  if (ret) {
+    if (handle_maps->dwVersion != VMMDLL_MAP_HANDLE_VERSION) {
+      VMMDLL_MemFree(handle_maps);
+      throw std::runtime_error("GetHandle version mismatched");
+    }
+    result.resize(handle_maps->cMap);
+    for (auto entry_count = 0; entry_count < handle_maps->cMap; entry_count++) {
+      auto ret = handle_maps->pMap[entry_count];
+      HandleEntry entry = {
+          .raw_entry = ret, .name = ret.uszText, .type = ret.uszType};
+      entry.raw_entry.uszText = &entry.name.at(0);
+      entry.raw_entry.uszType = &entry.type.at(0);
+      result.push_back(entry);
+    }
+    VMMDLL_MemFree(handle_maps);
+  }
+  return result;
+}
+
 }  // namespace MAP
 
 }  // namespace VMM

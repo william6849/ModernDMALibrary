@@ -191,6 +191,13 @@ std::vector<VadEntry> GetVad(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
     const uint32_t pid, const bool identify_modules);
 
+struct VadExEntry {
+  tdVMMDLL_MAP_VADEXENTRY raw_entry;
+};
+std::vector<VadExEntry> GetVadEx(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, const uint32_t start_page, const uint32_t pages);
+
 struct ModuleEntry {
   tdVMMDLL_MAP_MODULEENTRY raw_entry;
   std::string name = "\0";
@@ -198,7 +205,11 @@ struct ModuleEntry {
 };
 std::vector<ModuleEntry> GetModule(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
-    const uint32_t pid, uint32_t flags);
+    const uint32_t pid, const uint32_t flags);
+
+std::optional<ModuleEntry> GetModule(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, const uint32_t flags, const std::string& module_name);
 
 struct UnloadModuleEntry {
   tdVMMDLL_MAP_UNLOADEDMODULEENTRY raw_entry;
@@ -225,6 +236,36 @@ struct IatEntry {
 std::vector<IatEntry> GetIAT(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
     const uint32_t pid, std::string module_name);
+
+struct HeapEntry {
+  tdVMMDLL_MAP_HEAPENTRY raw_entry;
+};
+std::vector<HeapEntry> GetHeap(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid);
+
+struct HeapAllocEntry {
+  tdVMMDLL_MAP_HEAPALLOCENTRY raw_entry;
+};
+std::vector<HeapAllocEntry> GetHeapAlloc(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid, const uint64_t heap_number_or_address);
+
+struct ThreadEntry {
+  tdVMMDLL_MAP_THREADENTRY raw_entry;
+};
+std::vector<ThreadEntry> GetThread(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid);
+
+struct HandleEntry {
+  tdVMMDLL_MAP_HANDLEENTRY raw_entry;
+  std::string name = "\0";
+  std::string type = "\0";
+};
+std::vector<HandleEntry> GetHandle(
+    const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
+    const uint32_t pid);
 
 }  // namespace MAP
 
