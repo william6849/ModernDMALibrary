@@ -1,6 +1,7 @@
 #ifndef LEECH_WRAPPER_H
 #define LEECH_WRAPPER_H
 
+#include <array>
 #include <cstdint>
 #include <cstring>
 #include <functional>
