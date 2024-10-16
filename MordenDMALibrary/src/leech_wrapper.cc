@@ -151,7 +151,6 @@ auto ProcessGetInformationAll(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle) {
   DWORD information_counts = 0;
   PVMMDLL_PROCESS_INFORMATION information_list = nullptr;
-  printf("CALL:    VMMDLL_ProcessGetInformationAll\n");
   auto result = VMMDLL_ProcessGetInformationAll(
       handle->get(), &information_list, &information_counts);
   std::map<int32_t, ProcessInformation> process_information_map;
@@ -183,15 +182,17 @@ auto ProcessGetInformationAll(
 
       information.process_name = entry->szName;
       information.long_process_name = entry->szNameLong;
-      information.win.sid =
-          std::vector<int8_t>(entry->win.szSID, entry->win.szSID + MAX_PATH);
+      std::string sid_str = entry->win.szSID;
+      information.win.sid.assign(sid_str.begin(), sid_str.end());
 
       if (process_information_map.contains(entry->dwPID)) {
         information.child_process_pid_list = std::move(
-            process_information_map.at(entry->dwPID).child_process_pid_list);
+            process_information_map.at(static_cast<int32_t>(entry->dwPID))
+                .child_process_pid_list);
       }
 
-      process_information_map[entry->dwPID] = std::move(information);
+      process_information_map.at(static_cast<int32_t>(entry->dwPID)) =
+          std::move(information);
 
       process_information_map.at(entry->dwPPID)
           .child_process_pid_list.insert(entry->dwPID);
@@ -205,10 +206,9 @@ uint32_t PidGetFromName(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
     std::string process_name) {
   auto list = ProcessGetInformationAll(handle);
-  for (auto& entry : list) {
+  for (const auto& entry : list) {
     if (std::equal(entry.second.process_name.begin(),
-                   entry.second.process_name.begin() + process_name.size(),
-                   process_name.begin())) {
+                   entry.second.process_name.end(), process_name.begin())) {
       return entry.first;
     }
   }
@@ -224,19 +224,20 @@ std::vector<uint32_t> PidList(
     if (VMMDLL_PidList(handle->get(), pid_list.data(), &pid_numbers)) {
     }
   }
-  return std::vector<uint32_t>(pid_list.begin(), pid_list.end());
+  std::vector<uint32_t> return_list(pid_list.begin(), pid_list.end());
+  return std::move(return_list);
 }
 
 ProcessInformation ProcessGetInformation(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
     const uint32_t pid) {
-  return ProcessGetInformationAll(handle).at(pid);
+  return ProcessGetInformationAll(handle).at(static_cast<int32_t>(pid));
 }
 namespace PE {
 std::vector<_IMAGE_DATA_DIRECTORY> ProcessGetDirectories(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
     const uint32_t pid, const std::string& module_name) {
-  std::vector<_IMAGE_DATA_DIRECTORY> result(16);
+  std::vector<_IMAGE_DATA_DIRECTORY> result(IMAGE_DATA_DIRECTORY_SECTIONS);
   if (VMMDLL_ProcessGetDirectoriesU(handle->get(), pid, module_name.c_str(),
                                     result.data())) {
     return result;

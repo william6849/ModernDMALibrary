@@ -14,6 +14,7 @@
 #include "vmmdll.h"
 
 const int32_t DEFAULT_PAGE_BYTES = 4096;
+const uint32_t IMAGE_DATA_DIRECTORY_SECTIONS = 16;
 
 template <typename T>
 class HandleWrapper {
