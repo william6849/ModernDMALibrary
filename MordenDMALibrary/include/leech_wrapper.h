@@ -73,11 +73,11 @@ bool MemWrite(const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
 
 uint32_t MemReadScatter(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
-    const uint32_t pid, PPMEM_SCATTER scatter_list, int32_t scatter_size,
-    int32_t flags);
+    const uint32_t pid, PPMEM_SCATTER scatter_list, uint64_t scatter_size,
+    uint32_t flags);
 uint32_t MemWriteScatter(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
-    const uint32_t pid, PPMEM_SCATTER scatter_list, int32_t scatter_size);
+    const uint32_t pid, PPMEM_SCATTER scatter_list, uint64_t scatter_size);
 
 struct MemorySearchContext {
   std::vector<VMMDLL_MEM_SEARCH_CONTEXT_SEARCHENTRY> search_entry{3};
@@ -131,8 +131,8 @@ struct ProcessInformation {
   uint32_t pid;
   uint32_t parent_pid;
   uint32_t state;
-  std::array<int8_t, 16> process_name;
-  std::array<int8_t, 64> long_process_name;
+  std::string process_name;
+  std::string long_process_name;
   uint64_t directory_table_base;
   uint64_t directory_table_base_user_optional;
   struct {

@@ -135,16 +135,17 @@ std::vector<uint64_t> MemSearch(
 
 uint32_t MemReadScatter(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
-    const uint32_t pid, PPMEM_SCATTER scatter_list, int32_t scatter_size,
-    int32_t flags) {
-  return VMMDLL_MemReadScatter(handle->get(), pid, scatter_list, scatter_size,
-                               flags);
+    const uint32_t pid, PPMEM_SCATTER scatter_list, uint64_t scatter_size,
+    uint32_t flags) {
+  return VMMDLL_MemReadScatter(handle->get(), pid, scatter_list,
+                               static_cast<DWORD>(scatter_size), flags);
 }
 
 uint32_t MemWriteScatter(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle,
-    const uint32_t pid, PPMEM_SCATTER scatter_list, int32_t scatter_size) {
-  return VMMDLL_MemWriteScatter(handle->get(), pid, scatter_list, scatter_size);
+    const uint32_t pid, PPMEM_SCATTER scatter_list, uint64_t scatter_size) {
+  return VMMDLL_MemWriteScatter(handle->get(), pid, scatter_list,
+                                static_cast<DWORD>(scatter_size));
 }
 
 auto ProcessGetInformationAll(
@@ -181,24 +182,12 @@ auto ProcessGetInformationAll(
                   .luid = entry->win.qwLUID,
                   .integrity_level = entry->win.IntegrityLevel}};
 
-      std::copy(entry->szName,
-                entry->szName + std::min(information.process_name.size() - 1,
-                                         strlen(entry->szName)),
-                information.process_name.begin());
-      information.process_name[std::min(information.process_name.size() - 1,
-                                        strlen(entry->szName))] = '\0';
-      std::copy(
-          entry->szNameLong,
-          entry->szNameLong + std::min(information.long_process_name.size() - 1,
-                                       strlen(entry->szNameLong)),
-          information.long_process_name.begin());
-      information
-          .long_process_name[std::min(information.long_process_name.size() - 1,
-                                      strlen(entry->szNameLong))] = '\0';
+      information.process_name = entry->szName;
+      information.long_process_name = entry->szNameLong;
       std::copy(entry->win.szSID,
                 entry->win.szSID + std::min(information.win.sid.size() - 1,
                                             strlen(entry->win.szSID)),
-                information.win.sid.begin());
+                information.win.sid.data());
       information.win.sid[std::min(information.win.sid.size() - 1,
                                    strlen(entry->win.szSID))] = '\0';
 
@@ -233,14 +222,14 @@ uint32_t PidGetFromName(
 
 std::vector<uint32_t> PidList(
     const std::shared_ptr<HandleWrapper<tdVMM_HANDLE>> handle) {
-  std::vector<uint32_t> pid_list;
-  SIZE_T pid_number = 0;
-  if (VMMDLL_PidList(handle->get(), nullptr, &pid_number)) {
-    pid_list.resize(pid_number);
-    if (VMMDLL_PidList(handle->get(), pid_list.data(), &pid_number)) {
+  std::vector<DWORD> pid_list;
+  SIZE_T pid_numbers = 0;
+  if (VMMDLL_PidList(handle->get(), nullptr, &pid_numbers)) {
+    pid_list.resize(pid_numbers);
+    if (VMMDLL_PidList(handle->get(), pid_list.data(), &pid_numbers)) {
     }
   }
-  return pid_list;
+  return std::vector<uint32_t>(pid_list.begin(), pid_list.end());
 }
 
 ProcessInformation ProcessGetInformation(
