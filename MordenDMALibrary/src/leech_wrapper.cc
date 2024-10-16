@@ -1,6 +1,5 @@
 #include "leech_wrapper.h"
 
-#include <algorithm>
 #include <optional>
 #include <sstream>
 #include <stdexcept>
@@ -184,12 +183,8 @@ auto ProcessGetInformationAll(
 
       information.process_name = entry->szName;
       information.long_process_name = entry->szNameLong;
-      std::copy(entry->win.szSID,
-                entry->win.szSID + std::min(information.win.sid.size() - 1,
-                                            strlen(entry->win.szSID)),
-                information.win.sid.data());
-      information.win.sid[std::min(information.win.sid.size() - 1,
-                                   strlen(entry->win.szSID))] = '\0';
+      information.win.sid =
+          std::vector<int8_t>(entry->win.szSID, entry->win.szSID + MAX_PATH);
 
       if (process_information_map.contains(entry->dwPID)) {
         information.child_process_pid_list = std::move(

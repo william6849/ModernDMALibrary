@@ -1,7 +1,6 @@
 #ifndef LEECH_WRAPPER_H
 #define LEECH_WRAPPER_H
 
-#include <array>
 #include <cstdint>
 #include <cstring>
 #include <functional>
@@ -11,6 +10,7 @@
 #include <unordered_set>
 #include <vector>
 
+#include "leechcore.h"
 #include "vmmdll.h"
 
 const int32_t DEFAULT_PAGE_BYTES = 4096;
@@ -143,7 +143,7 @@ struct ProcessInformation {
     uint32_t process_environment_block_32;
     uint32_t session_id;
     uint64_t luid;
-    std::array<int8_t, MAX_PATH> sid;
+    std::vector<int8_t> sid;
     VMMDLL_PROCESS_INTEGRITY_LEVEL integrity_level;
   } win;
 
