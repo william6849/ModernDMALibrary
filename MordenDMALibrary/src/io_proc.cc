@@ -1,9 +1,5 @@
 #include "io_proc.h"
 
-bool DMATask::operator<(const DMATask& other) const {
-  return priority > other.priority;
-};
-
 DMATaskExecutor::DMATaskExecutor()
     : vmm_handle_(new HandleWrapper<tdVMM_HANDLE>(nullptr, VMM::HandleDeleter)),
       lc_handle_(new HandleWrapper<void>(nullptr, LC::HandleDeleter)),

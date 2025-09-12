@@ -1,7 +1,5 @@
 #include "device_manager.h"
 
-#include <stdexcept>
-
 #include "spdlog/spdlog.h"
 
 DeviceManager& DeviceManager::GetInstance() {

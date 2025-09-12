@@ -1,5 +1,4 @@
-#ifndef IO_PROC_H
-#define IO_PROC_H
+#pragma once
 
 #include <condition_variable>
 #include <functional>
@@ -8,12 +7,12 @@
 #include <queue>
 #include <thread>
 
-#include "leech_wrapper.h"
-
 struct DMATask {
-  std::function<void()> func;
+  std::move_only_function<void()> func;
   int priority;
-  bool operator<(const DMATask& other) const;
+  bool operator<(const DMATask& other) const const {
+    return priority > other.priority;
+  };
 };
 
 class DMATaskExecutor {
@@ -80,37 +79,32 @@ class DMATaskExecutor {
 
 template <typename Func, typename... Args>
 auto DMATaskExecutor::Call(uint8_t priority, Func&& func, Args&&... args) {
-  auto pack = std::bind(std::forward<Func>(func), std::forward<Args>(args)...);
-  using return_type = decltype(pack());
-  std::function<return_type()> task = pack;
-  return TaskProducer(task, priority);
+  using return_type = std::invoke_result_t<Func, Args...>;
+  auto task_wrapper = [func = std::forward<Func>(func),
+                       ... args =
+                           std::forward<Args>(args)]() mutable -> return_type {
+    if constexpr (std::is_void_v<return_type>) {
+      std::invoke(func, std::forward<Args>(args)...);
+    } else {
+      return std::invoke(func, std::forward<Args>(args)...);
+    }
+  };
+  return TaskProducer(std::move(task_wrapper), priority);
 }
 
 template <typename Func>
 auto DMATaskExecutor::TaskProducer(Func&& task, uint8_t priority) {
-  auto result_promise =
-      std::make_shared<std::promise<std::invoke_result_t<Func>>>();
-  auto result_future = result_promise->get_future();
+  using ReturnType = std::invoke_result_t<Func>;
 
-  auto packed_task = [task, result_promise]() {
-    try {
-      auto ret = task();
-      result_promise->set_value(ret);
-    } catch (...) {
-      try {
-        result_promise->set_exception(std::current_exception());
-      } catch (...) {
-      }
-    }
-  };
+  std::packaged_task<ReturnType()> task_pkg(std::forward<Func>(task));
+  auto result_future = task_pkg->get_future();
 
   {
     std::lock_guard<std::mutex> lock(queue_mutex);
-    dmatask_queue.push(DMATask{packed_task, priority});
+    dmatask_queue.push(
+        DMATask{[task = std::move(task_pkg)]() mutable { task(); }, priority});
   }
   queue_cv.notify_one();
 
   return result_future;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef DEVICE_H
-#define DEVICE_H
+#pragma once
 
 #include <cstdint>
 #include <string>
@@ -24,5 +23,3 @@ class Device {
  private:
   DMAIO io_;
 };
-
-#endif
