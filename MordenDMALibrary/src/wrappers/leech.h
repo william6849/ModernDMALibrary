@@ -10,9 +10,6 @@
 #include <unordered_set>
 #include <vector>
 
-#include "leechcore.h"
-#include "vmmdll.h"
-
 #include "api/*"
 
 template <typename T>
@@ -41,6 +38,9 @@ void HandleDeleter(VMM_HANDLE handle);
 };  // namespace VMM
 
 #endif
+
+#include "leechcore.h"
+#include "vmmdll.h"
 
 #include "leechcore.h"
 #include "vmmdll.h"

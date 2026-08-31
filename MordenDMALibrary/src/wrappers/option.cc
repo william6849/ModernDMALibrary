@@ -3,7 +3,7 @@
 template <typename S>
 OptionProxy<S>::OptionProxy(const std::shared_ptr<DMATaskExecutor>& dma_exec,
                             uint64_t opt, bool read, bool write)
-    : dma_exec_(dma_exec), opt_(opt), read_(read), write_(write){};
+    : dma_exec_(dma_exec), opt_(opt), read_(read), write_(write) {};
 
 template <typename S>
 S OptionProxy<S>::Read() {
