@@ -1,8 +1,8 @@
 #pragma once
 
 #include <chrono>
-#include <vector>
 #include <map>
+#include <vector>
 
 struct ScatterRequestPackage {
   MEM_SCATTER scatter{

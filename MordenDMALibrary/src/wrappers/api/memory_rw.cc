@@ -1,4 +1,5 @@
 #include "memory_rw.h"
+
 #include <ranges>
 
 namespace VMM {
@@ -68,11 +69,10 @@ std::expected<bool, std::string> MemPrefetchPages(
     return std::unexpected("Prefetch addresses vector is empty");
   }
 
-  auto vec_ull = prefetch_addresses
-                 | std::views::transform([](uint64_t addr){ 
-                       return static_cast<unsigned long long>(addr); 
-                   })
-                 | std::ranges::to<std::vector>();
+  auto vec_ull = prefetch_addresses | std::views::transform([](uint64_t addr) {
+                   return static_cast<unsigned long long>(addr);
+                 }) |
+                 std::ranges::to<std::vector>();
 
   bool result = VMMDLL_MemPrefetchPages(handle->get(), static_cast<DWORD>(pid),
                                         vec_ull.data(), vec_ull.size());
